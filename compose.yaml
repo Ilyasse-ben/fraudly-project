@@ -1,0 +1,82 @@
+services:
+  
+  basse-de-donnes:
+    image: 'postgres:15'
+    container_name: pgdb
+    environment:
+      - 'POSTGRES_PASSWORD=1234'
+      - 'POSTGRES_USER=ilyasse'
+    networks:
+      - fraoudly-networks
+    volumes:
+      - fraoudly-volumes:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+
+      
+  authentification-service:
+    container_name: authentification-service     
+    build: ./Backend-Spring/authentification-service
+    ports:
+      - '8080:8080'
+    environment:
+      - DB_URL=jdbc:postgresql://pgdb:5432/mydb
+    depends_on:
+      - basse-de-donnes
+    networks:
+      - fraoudly-networks
+
+
+  learning-service:
+    container_name: learning-service      
+    build: ./Backend-Spring/learning-service
+    ports:
+      - '8081:8080'
+    environment:
+      - DB_URL=jdbc:postgresql://pgdb:5432/mydb
+    depends_on:
+      - basse-de-donnes
+    networks:
+      - fraoudly-networks
+
+
+  assessment-service:
+    container_name: assessment-service      
+    build: ./Backend-Spring/assessment-service
+    ports:
+      - '8082:8080'
+    environment:
+      - DB_URL=jdbc:postgresql://pgdb:5432/mydb
+    depends_on:
+      - basse-de-donnes
+    networks:
+      - fraoudly-networks
+
+
+  proctoring-service:
+    container_name: proctoring-service     
+    build: ./Backend-Spring/proctoring-service
+    ports:
+      - '8083:8080'
+    environment:
+      - DB_URL=jdbc:postgresql://pgdb:5432/mydb
+    depends_on:
+      - basse-de-donnes
+    networks:
+      - fraoudly-networks
+  frontend-service:
+    container_name: frontend-service
+    build: ./Frontend
+    ports:
+      - '80:80'
+    networks:
+      - fraoudly-networks
+    
+
+networks: 
+  fraoudly-networks:
+    driver: bridge
+
+volumes:
+  fraoudly-volumes:
+
