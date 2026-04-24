@@ -5,6 +5,7 @@
     <option name="originalFiles">
       <list>
         <option value="$PROJECT_DIR$/Backend-Spring/authentification-service/pom.xml" />
+        <option value="$PROJECT_DIR$/Backend-Spring/assessment-service/pom.xml" />
       </list>
     </option>
   </component>
