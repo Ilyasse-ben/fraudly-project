@@ -1,0 +1,28 @@
+# API
+fastapi
+uvicorn[standard]
+
+# RAG / LLM stack
+langchain
+langgraph
+langchain-community
+langchain-groq
+langchain-google-genai
+chromadb
+sentence-transformers
+tiktoken
+
+# Documents parsing
+pymupdf
+python-docx
+python-multipart
+
+# OCR (images → texte)
+pytesseract
+Pillow
+
+# Data validation
+pydantic
+
+# Messaging
+kafka-python
