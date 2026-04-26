@@ -5,6 +5,7 @@ import net.ilyasse.assessmentservice.dto.request.UpdateQuestionRequest;
 import net.ilyasse.assessmentservice.dto.response.ExamResponse;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -20,4 +21,6 @@ public interface ExamService {
     ExamResponse validateExam(UUID examId);
     ExamResponse publishExam(UUID examId);
     void launchCorrection(UUID examId, UUID professorId);
+    List<Map<String, Object>> getOpenAnswers(UUID examId);
+    void updateAnswerScore(UUID answerId, Double pointsAwarded, UUID professorId);
 }

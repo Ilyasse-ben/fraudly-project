@@ -36,6 +36,10 @@ public class ExamAnswer {
     private Double pointsAwarded;
     private Boolean isGraded = false;
     private LocalDateTime answeredAt;
+    private Boolean modifiedByProfessor = false;
+    private Double originalAiScore;
+    private UUID modifiedByProfessorId;
+    private LocalDateTime modifiedAt;
 
     @PrePersist
     protected void onCreate() {

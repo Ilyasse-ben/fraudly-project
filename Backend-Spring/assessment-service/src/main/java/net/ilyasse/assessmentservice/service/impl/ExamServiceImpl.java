@@ -23,9 +23,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -47,6 +46,8 @@ public class ExamServiceImpl implements ExamService {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
     private final CorrectionKafkaProducer correctionKafkaProducer;
+    private final ExamAttemptRepository examAttemptRepository;
+    private final ExamAnswerRepository examAnswerRepository;
 
     @Value("${ai.service.url}")
     private String aiServiceUrl;
@@ -373,7 +374,7 @@ public class ExamServiceImpl implements ExamService {
         examRepository.save(exam);
         return getExamById(examId);
     }
-    
+    @Override
     public void launchCorrection(UUID examId, UUID professorId) {
     Exam exam = examRepository.findById(examId)
         .orElseThrow(() -> new RuntimeException("Exam not found: " + examId));
@@ -385,4 +386,61 @@ public class ExamServiceImpl implements ExamService {
     
     log.info("[Correction] Lancée: exam={} prof={}", examId, professorId);
 }
+    @Override
+    public List<Map<String, Object>> getOpenAnswers(UUID examId) {
+        List<ExamAttempt> attempts = examAttemptRepository.findByExamId(examId);
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        for (ExamAttempt attempt : attempts) {
+            List<ExamAnswer> openAnswers = examAnswerRepository
+                    .findByAttemptIdAndQuestionType(attempt.getId(), QuestionType.OPEN);
+
+            for (ExamAnswer answer : openAnswers) {
+                Map<String, Object> item = new HashMap<>();
+                item.put("answerId", answer.getId());
+                item.put("studentId", attempt.getStudentId());
+                item.put("questionText", answer.getQuestion().getQuestionText());
+                item.put("correctAnswer", answer.getQuestion().getCorrectAnswer());
+                item.put("studentAnswer", answer.getAnswerText());
+                item.put("pointsAwarded", answer.getPointsAwarded());
+                item.put("maxPoints", answer.getQuestion().getPoints());
+                item.put("isGraded", answer.getIsGraded());
+                item.put("modifiedByProfessor", answer.getModifiedByProfessor());
+                item.put("originalAiScore", answer.getOriginalAiScore());
+                item.put("modifiedAt", answer.getModifiedAt());
+                result.add(item);
+            }
+        }
+        return result;
+    }
+    @Override
+    public void updateAnswerScore(UUID answerId, Double pointsAwarded, UUID professorId) {
+        examAnswerRepository.findById(answerId).ifPresent(answer -> {
+
+            // Sauvegarder le score IA original si première modification
+            if (answer.getOriginalAiScore() == null) {
+                answer.setOriginalAiScore(answer.getPointsAwarded());
+            }
+
+            answer.setPointsAwarded(pointsAwarded);
+            answer.setIsGraded(true);
+            answer.setModifiedByProfessor(true);
+            answer.setModifiedByProfessorId(professorId);
+            answer.setModifiedAt(LocalDateTime.now());
+            examAnswerRepository.save(answer);
+
+            // Recalculer le score total
+            ExamAttempt attempt = answer.getAttempt();
+            double totalScore = examAnswerRepository
+                    .findByAttemptId(attempt.getId())
+                    .stream()
+                    .mapToDouble(a -> a.getPointsAwarded() != null ? a.getPointsAwarded() : 0.0)
+                    .sum();
+            attempt.setScore(totalScore);
+            examAttemptRepository.save(attempt);
+
+            log.info("[Score] Modifié par prof={}: answer={} aiScore={} newScore={}",
+                    professorId, answerId, answer.getOriginalAiScore(), pointsAwarded);
+        });
+    }
 }

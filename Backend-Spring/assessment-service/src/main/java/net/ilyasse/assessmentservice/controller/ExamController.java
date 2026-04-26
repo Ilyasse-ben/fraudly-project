@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -102,5 +103,17 @@ public class ExamController {
     @GetMapping("/attempts/exam/{examId}")
     public ResponseEntity<List<ExamAttemptResponse>> getAttemptsByExam(@PathVariable UUID examId) {
         return ResponseEntity.ok(examAttemptService.getAttemptsByExam(examId));
+    }
+    @GetMapping("/{examId}/open-answers")
+    public ResponseEntity<List<Map<String, Object>>> getOpenAnswers(@PathVariable UUID examId) {
+        return ResponseEntity.ok(examService.getOpenAnswers(examId));
+    }
+    @PatchMapping("/answers/{answerId}/score")
+    public ResponseEntity<Void> updateAnswerScore(
+            @PathVariable UUID answerId,
+            @RequestParam Double pointsAwarded,
+            @RequestParam UUID professorId) {
+        examService.updateAnswerScore(answerId, pointsAwarded, professorId);
+        return ResponseEntity.ok().build();
     }
 }

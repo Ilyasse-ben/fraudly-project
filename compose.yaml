@@ -4,8 +4,8 @@ services:
     image: 'postgres:15'
     container_name: pgdb
     environment:
-      - 'POSTGRES_PASSWORD=1234'
-      - 'POSTGRES_USER=ilyasse'
+      - 'POSTGRES_PASSWORD=fraudly'
+      - 'POSTGRES_USER=fraudly'
     networks:
       - fraoudly-networks
     volumes:
@@ -114,3 +114,4 @@ volumes:
   redis-data:
   
 
+ 

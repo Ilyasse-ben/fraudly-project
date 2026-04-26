@@ -63,21 +63,6 @@ public class ExamScoredKafkaConsumer {
         }
     }
 
-    @KafkaListener(
-        topics = "${kafka.topic.collusion.suspected}",
-        groupId = "${spring.kafka.consumer.group-id}"
-    )
-    public void consumeCollusionSuspected(String message) {
-        try {
-            Map<String, Object> event = objectMapper.readValue(message, Map.class);
-            log.warn("[Collusion] Alerte reçue: exam={} pairs={}", 
-                event.get("exam_id"), event.get("suspected_pairs"));
-            // TODO: stocker en DB + notifier prof
-        } catch (Exception e) {
-            log.error("[Collusion] Erreur consommation: {}", e.getMessage());
-        }
-    }
-
     private void recalculateAttemptScore(ExamAttempt attempt) {
         double totalScore = examAnswerRepository
             .findByAttemptId(attempt.getId())
