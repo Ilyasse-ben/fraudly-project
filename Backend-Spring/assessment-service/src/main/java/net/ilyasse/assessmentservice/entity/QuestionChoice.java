@@ -2,6 +2,7 @@ package net.ilyasse.assessmentservice.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import java.util.UUID;
 
 /**
  * @author ELHAID Yousef
@@ -15,8 +16,8 @@ import lombok.*;
 public class QuestionChoice {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @ManyToOne
     @JoinColumn(name = "question_id", nullable = false)

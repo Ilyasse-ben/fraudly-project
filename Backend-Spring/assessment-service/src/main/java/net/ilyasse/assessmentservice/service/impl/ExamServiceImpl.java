@@ -2,7 +2,9 @@ package net.ilyasse.assessmentservice.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import net.ilyasse.assessmentservice.dto.AiGenerationResponse;
+import lombok.extern.slf4j.Slf4j;
+import net.ilyasse.assessmentservice.dto.request.BackendAiGenerationRequest;
+import net.ilyasse.assessmentservice.dto.response.AiGenerationResponse;
 import net.ilyasse.assessmentservice.dto.request.ExamConfigRequest;
 import net.ilyasse.assessmentservice.dto.request.UpdateChoiceRequest;
 import net.ilyasse.assessmentservice.dto.request.UpdateQuestionRequest;
@@ -13,6 +15,7 @@ import net.ilyasse.assessmentservice.entity.*;
 import net.ilyasse.assessmentservice.enums.Difficulty;
 import net.ilyasse.assessmentservice.enums.ExamStatus;
 import net.ilyasse.assessmentservice.enums.QuestionType;
+import net.ilyasse.assessmentservice.kafka.CorrectionKafkaProducer;
 import net.ilyasse.assessmentservice.repository.*;
 import net.ilyasse.assessmentservice.service.ExamService;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,11 +25,13 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
  * @author ELHAID Yousef
  **/
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -41,6 +46,7 @@ public class ExamServiceImpl implements ExamService {
     private final AiGenerationAuditRepository aiGenerationAuditRepository;
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
+    private final CorrectionKafkaProducer correctionKafkaProducer;
 
     @Value("${ai.service.url}")
     private String aiServiceUrl;
@@ -96,7 +102,25 @@ public class ExamServiceImpl implements ExamService {
     private AiGenerationResponse callAiService(ExamConfigRequest request) {
         try {
             String url = aiServiceUrl + "/generate";
-            String response = restTemplate.postForObject(url, request, String.class);
+            BackendAiGenerationRequest aiRequest = BackendAiGenerationRequest.builder()
+                .topic(request.getTopic() != null && !request.getTopic().isBlank()
+                    ? request.getTopic()
+                    : request.getTitle())
+                .courseId(request.getCourseId() != null ? request.getCourseId().toString() : null)
+                .chapterIds(request.getChapterIds() == null ? null : request.getChapterIds().stream()
+                    .map(String::valueOf)
+                    .toList())
+                    .difficulty(mapBackendDifficulty(request.getDifficulty()))
+                .totalQuestions(request.getNbQcm() + request.getNbTrueFalse() + request.getNbOpen())
+                .qcmCount(request.getNbQcm())
+                .trueFalseCount(request.getNbTrueFalse())
+                .openCount(request.getNbOpen())
+                .includeExplanations(request.getIncludeExplanations() == null || request.getIncludeExplanations())
+                .professorInstructions(request.getProfessorInstructions())
+                .topK(request.getTopK() != null ? request.getTopK() : 8)
+                .build();
+
+            String response = restTemplate.postForObject(url, aiRequest, String.class);
             return objectMapper.readValue(response, AiGenerationResponse.class);
         } catch (Exception e) {
             throw new RuntimeException("Failed to call AI service: " + e.getMessage());
@@ -109,6 +133,10 @@ public class ExamServiceImpl implements ExamService {
         int index = 1;
         for (AiGenerationResponse.AiQuestion aiQuestion : aiResponse.getQuestions()) {
             QuestionType type = mapQuestionType(aiQuestion.getType(), qcmType);
+            int points = 1;
+            if (aiQuestion.getMaxScore() != null && aiQuestion.getMaxScore() > 0) {
+                points = Math.max(1, (int) Math.ceil(aiQuestion.getMaxScore()));
+            }
 
             ExamQuestion question = ExamQuestion.builder()
                     .exam(exam)
@@ -120,7 +148,7 @@ public class ExamServiceImpl implements ExamService {
                     .correctAnswer(aiQuestion.getCorrectAnswer())
                     .explanation(aiQuestion.getExplanation())
                     .difficulty(mapDifficulty(aiQuestion.getDifficulty()))
-                    .points(1)
+                    .points(points)
                     .generatedByAi(true)
                     .editedByTeacher(false)
                     .build();
@@ -204,8 +232,18 @@ public class ExamServiceImpl implements ExamService {
         };
     }
 
+    private String mapBackendDifficulty(Difficulty difficulty) {
+        if (difficulty == null) return "moyen";
+
+        return switch (difficulty) {
+            case EASY -> "facile";
+            case MEDIUM -> "moyen";
+            case HARD, VERY_HARD -> "difficile";
+        };
+    }
+
     @Override
-    public ExamResponse getExamById(Long examId) {
+    public ExamResponse getExamById(UUID examId) {
         Exam exam = examRepository.findById(examId)
                 .orElseThrow(() -> new RuntimeException("Exam not found: " + examId));
 
@@ -255,21 +293,21 @@ public class ExamServiceImpl implements ExamService {
     }
 
     @Override
-    public List<ExamResponse> getExamsByProfessor(Long professorId) {
+    public List<ExamResponse> getExamsByProfessor(UUID professorId) {
         return examRepository.findByProfessorId(professorId)
                 .stream().map(e -> getExamById(e.getId()))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<ExamResponse> getExamsByCourse(Long courseId) {
+    public List<ExamResponse> getExamsByCourse(UUID courseId) {
         return examRepository.findByCourseId(courseId)
                 .stream().map(e -> getExamById(e.getId()))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public ExamResponse updateQuestion(Long questionId, UpdateQuestionRequest request, Long professorId) {
+    public ExamResponse updateQuestion(UUID questionId, UpdateQuestionRequest request, UUID professorId) {
         ExamQuestion question = examQuestionRepository.findById(questionId)
                 .orElseThrow(() -> new RuntimeException("Question not found: " + questionId));
 
@@ -312,14 +350,14 @@ public class ExamServiceImpl implements ExamService {
     }
 
     @Override
-    public ExamResponse deleteQuestion(Long questionId, Long examId) {
+    public ExamResponse deleteQuestion(UUID questionId, UUID examId) {
         questionChoiceRepository.deleteByQuestionId(questionId);
         examQuestionRepository.deleteById(questionId);
         return getExamById(examId);
     }
 
     @Override
-    public ExamResponse validateExam(Long examId) {
+    public ExamResponse validateExam(UUID examId) {
         Exam exam = examRepository.findById(examId)
                 .orElseThrow(() -> new RuntimeException("Exam not found: " + examId));
         exam.setStatus(ExamStatus.REVIEWED);
@@ -328,11 +366,23 @@ public class ExamServiceImpl implements ExamService {
     }
 
     @Override
-    public ExamResponse publishExam(Long examId) {
+    public ExamResponse publishExam(UUID examId) {
         Exam exam = examRepository.findById(examId)
                 .orElseThrow(() -> new RuntimeException("Exam not found: " + examId));
         exam.setStatus(ExamStatus.PUBLISHED);
         examRepository.save(exam);
         return getExamById(examId);
     }
+    
+    public void launchCorrection(UUID examId, UUID professorId) {
+    Exam exam = examRepository.findById(examId)
+        .orElseThrow(() -> new RuntimeException("Exam not found: " + examId));
+    
+    exam.setStatus(ExamStatus.GRADING);
+    examRepository.save(exam);
+    
+    correctionKafkaProducer.publishCorrectionRequested(examId, professorId);
+    
+    log.info("[Correction] Lancée: exam={} prof={}", examId, professorId);
+}
 }

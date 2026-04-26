@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import net.ilyasse.assessmentservice.enums.AttemptStatus;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * @author ELHAID Yousef
@@ -17,15 +18,15 @@ import java.time.LocalDateTime;
 public class ExamAttempt {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @ManyToOne
     @JoinColumn(name = "exam_id", nullable = false)
     private Exam exam;
 
     @Column(nullable = false)
-    private Long studentId;
+    private UUID studentId;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

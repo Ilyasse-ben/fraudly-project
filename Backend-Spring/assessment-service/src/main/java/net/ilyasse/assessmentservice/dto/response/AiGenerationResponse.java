@@ -3,6 +3,7 @@ package net.ilyasse.assessmentservice.dto.response;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import java.util.List;
+import java.util.Map;
 /**
  * @author ELHAID Yousef
  **/
@@ -12,6 +13,8 @@ public class AiGenerationResponse {
 
     private String topic;
     private String difficulty;
+
+    private String provider;
 
     @JsonProperty("total_requested")
     private Integer totalRequested;
@@ -25,6 +28,8 @@ public class AiGenerationResponse {
     @JsonProperty("rag_context")
     private List<AiRagContext> ragContext;
 
+    private Map<String, Integer> distribution;
+
     private AiAudit audit;
 
     @Data
@@ -34,6 +39,9 @@ public class AiGenerationResponse {
         private String difficulty;
         private String question;
         private List<AiChoice> choices;
+
+        @JsonProperty("max_score")
+        private Double maxScore;
 
         @JsonProperty("correct_answer")
         private String correctAnswer;

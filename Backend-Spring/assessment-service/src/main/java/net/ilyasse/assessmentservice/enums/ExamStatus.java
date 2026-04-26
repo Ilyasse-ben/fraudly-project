@@ -7,5 +7,6 @@ public enum ExamStatus {
     DRAFT,
     REVIEWED,
     PUBLISHED,
-    ARCHIVED
+    ARCHIVED,
+    GRADING
 }

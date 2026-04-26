@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import net.ilyasse.assessmentservice.enums.Difficulty;
 import net.ilyasse.assessmentservice.enums.QuestionType;
+import java.util.UUID;
 
 /**
  * @author ELHAID Yousef
@@ -18,8 +19,8 @@ import net.ilyasse.assessmentservice.enums.QuestionType;
 public class ExamQuestion {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @ManyToOne
     @JoinColumn(name = "exam_id", nullable = false)

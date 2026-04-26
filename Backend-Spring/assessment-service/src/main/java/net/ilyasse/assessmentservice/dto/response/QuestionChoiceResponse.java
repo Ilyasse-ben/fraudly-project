@@ -2,6 +2,7 @@ package net.ilyasse.assessmentservice.dto.response;
 
 import lombok.Builder;
 import lombok.Data;
+import java.util.UUID;
 
 /**
  * @author ELHAID Yousef
@@ -9,7 +10,7 @@ import lombok.Data;
 @Data
 @Builder
 public class QuestionChoiceResponse {
-    private Long id;
+    private UUID id;
     private String label;
     private String text;
     private Boolean isCorrect;

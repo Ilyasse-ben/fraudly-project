@@ -3,6 +3,7 @@ package net.ilyasse.assessmentservice.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * @author ELHAID Yousef
@@ -16,8 +17,8 @@ import java.time.LocalDateTime;
 public class ExamAnswer {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @ManyToOne
     @JoinColumn(name = "attempt_id", nullable = false)
@@ -30,7 +31,7 @@ public class ExamAnswer {
     @Column(columnDefinition = "TEXT")
     private String answerText;
 
-    private Long selectedChoiceId;
+    private UUID selectedChoiceId;
     private Boolean isCorrect;
     private Double pointsAwarded;
     private Boolean isGraded = false;

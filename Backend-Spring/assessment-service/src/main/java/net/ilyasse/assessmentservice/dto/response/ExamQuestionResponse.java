@@ -5,6 +5,7 @@ import lombok.Data;
 import net.ilyasse.assessmentservice.enums.Difficulty;
 import net.ilyasse.assessmentservice.enums.QuestionType;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author ELHAID Yousef
@@ -12,7 +13,7 @@ import java.util.List;
 @Data
 @Builder
 public class ExamQuestionResponse {
-    private Long id;
+    private UUID id;
     private Integer orderIndex;
     private QuestionType type;
     private String questionText;

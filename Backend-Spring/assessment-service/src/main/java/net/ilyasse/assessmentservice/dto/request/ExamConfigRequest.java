@@ -6,6 +6,7 @@ import lombok.Data;
 import net.ilyasse.assessmentservice.enums.Difficulty;
 import net.ilyasse.assessmentservice.enums.QuestionType;
 import java.util.List;
+import java.util.UUID;
 /**
  * @author ELHAID Yousef
  **/
@@ -13,11 +14,13 @@ import java.util.List;
 @Data
 public class ExamConfigRequest {
 
-    @NotNull
-    private Long courseId;
+    private String topic;
 
     @NotNull
-    private Long professorId;
+    private UUID courseId;
+
+    @NotNull
+    private UUID professorId;
 
     @NotNull
     private String title;
@@ -41,8 +44,14 @@ public class ExamConfigRequest {
     private Integer nbOpen;
 
     @NotNull
-    private List<Integer> chapterIds;
+    private List<UUID> chapterIds;
 
     @NotNull
     private Difficulty difficulty;
+
+    private Integer topK;
+
+    private Boolean includeExplanations;
+
+    private String professorInstructions;
 }

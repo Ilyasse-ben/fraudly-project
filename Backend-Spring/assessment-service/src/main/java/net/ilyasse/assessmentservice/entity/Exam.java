@@ -5,6 +5,7 @@ import lombok.*;
 import net.ilyasse.assessmentservice.enums.Difficulty;
 import net.ilyasse.assessmentservice.enums.ExamStatus;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 
 /**
@@ -19,8 +20,8 @@ import java.time.LocalDateTime;
 public class Exam {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @Column(nullable = false)
     private String title;
@@ -38,10 +39,10 @@ public class Exam {
     private Integer version = 1;
 
     @Column(nullable = false)
-    private Long courseId;
+    private UUID courseId;
 
     @Column(nullable = false)
-    private Long professorId;
+    private UUID professorId;
 
     private Integer durationMinutes;
 

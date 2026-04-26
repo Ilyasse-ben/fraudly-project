@@ -5,17 +5,19 @@ import net.ilyasse.assessmentservice.dto.request.UpdateQuestionRequest;
 import net.ilyasse.assessmentservice.dto.response.ExamResponse;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author ELHAID Yousef
  **/
 public interface ExamService {
     ExamResponse createExam(ExamConfigRequest request);
-    ExamResponse getExamById(Long examId);
-    List<ExamResponse> getExamsByProfessor(Long professorId);
-    List<ExamResponse> getExamsByCourse(Long courseId);
-    ExamResponse updateQuestion(Long questionId, UpdateQuestionRequest request, Long professorId);
-    ExamResponse deleteQuestion(Long questionId, Long examId);
-    ExamResponse validateExam(Long examId);
-    ExamResponse publishExam(Long examId);
+    ExamResponse getExamById(UUID examId);
+    List<ExamResponse> getExamsByProfessor(UUID professorId);
+    List<ExamResponse> getExamsByCourse(UUID courseId);
+    ExamResponse updateQuestion(UUID questionId, UpdateQuestionRequest request, UUID professorId);
+    ExamResponse deleteQuestion(UUID questionId, UUID examId);
+    ExamResponse validateExam(UUID examId);
+    ExamResponse publishExam(UUID examId);
+    void launchCorrection(UUID examId, UUID professorId);
 }

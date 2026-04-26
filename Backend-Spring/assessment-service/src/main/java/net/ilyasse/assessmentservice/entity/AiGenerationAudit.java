@@ -3,6 +3,7 @@ package net.ilyasse.assessmentservice.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * @author ELHAID Yousef
@@ -16,8 +17,8 @@ import java.time.LocalDateTime;
 public class AiGenerationAudit {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @OneToOne
     @JoinColumn(name = "exam_id", nullable = false)

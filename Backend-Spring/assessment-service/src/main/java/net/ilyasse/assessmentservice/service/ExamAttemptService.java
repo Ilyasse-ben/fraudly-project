@@ -5,6 +5,7 @@ import net.ilyasse.assessmentservice.dto.request.SubmitAttemptRequest;
 import net.ilyasse.assessmentservice.dto.response.ExamAttemptResponse;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author ELHAID Yousef
@@ -12,7 +13,7 @@ import java.util.List;
 public interface ExamAttemptService {
     ExamAttemptResponse startAttempt(StartAttemptRequest request);
     ExamAttemptResponse submitAttempt(SubmitAttemptRequest request);
-    ExamAttemptResponse getAttemptById(Long attemptId);
-    List<ExamAttemptResponse> getAttemptsByStudent(Long studentId);
-    List<ExamAttemptResponse> getAttemptsByExam(Long examId);
+    ExamAttemptResponse getAttemptById(UUID attemptId);
+    List<ExamAttemptResponse> getAttemptsByStudent(UUID studentId);
+    List<ExamAttemptResponse> getAttemptsByExam(UUID examId);
 }

@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author ELHAID Yousef
@@ -12,7 +13,7 @@ import java.util.List;
 public class SubmitAttemptRequest {
 
     @NotNull
-    private Long attemptId;
+    private UUID attemptId;
 
     @NotNull
     private List<SubmitAnswerRequest> answers;

@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -86,7 +87,7 @@ public class ExamAttemptServiceImpl implements ExamAttemptService {
 
                 double points = 0;
                 if (answerReq.getSelectedChoiceIds() != null) {
-                    for (Long choiceId : answerReq.getSelectedChoiceIds()) {
+                    for (UUID choiceId : answerReq.getSelectedChoiceIds()) {
                         ExamAnswerChoice answerChoice = ExamAnswerChoice.builder()
                                 .answer(answer)
                                 .choiceId(choiceId)
@@ -145,21 +146,21 @@ public class ExamAttemptServiceImpl implements ExamAttemptService {
     }
 
     @Override
-    public ExamAttemptResponse getAttemptById(Long attemptId) {
+    public ExamAttemptResponse getAttemptById(UUID attemptId) {
         ExamAttempt attempt = examAttemptRepository.findById(attemptId)
                 .orElseThrow(() -> new RuntimeException("Attempt not found"));
         return mapToResponse(attempt);
     }
 
     @Override
-    public List<ExamAttemptResponse> getAttemptsByStudent(Long studentId) {
+    public List<ExamAttemptResponse> getAttemptsByStudent(UUID studentId) {
         return examAttemptRepository.findByStudentId(studentId)
                 .stream().map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<ExamAttemptResponse> getAttemptsByExam(Long examId) {
+    public List<ExamAttemptResponse> getAttemptsByExam(UUID examId) {
         return examAttemptRepository.findByExamId(examId)
                 .stream().map(this::mapToResponse)
                 .collect(Collectors.toList());

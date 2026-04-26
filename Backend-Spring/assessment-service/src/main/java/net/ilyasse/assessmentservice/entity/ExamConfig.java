@@ -6,6 +6,7 @@ import lombok.*;
 import net.ilyasse.assessmentservice.enums.Difficulty;
 import net.ilyasse.assessmentservice.enums.QuestionType;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * @author ELHAID Yousef
@@ -19,8 +20,8 @@ import java.time.LocalDateTime;
 public class ExamConfig {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @OneToOne
     @JoinColumn(name = "exam_id", nullable = false)
