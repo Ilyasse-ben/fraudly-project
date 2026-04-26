@@ -48,7 +48,7 @@ class Settings(BaseSettings):
     LLM_TEMPERATURE: float = 0.1
 
     # ── Kafka ─────────────────────────────────────────────
-    KAFKA_ENABLED: bool = False
+    KAFKA_ENABLED: bool = True
     KAFKA_BOOTSTRAP_SERVERS: str = "localhost:9092"
     KAFKA_GROUP_ID: str = "fraudly-ia-service"
     KAFKA_TOPIC_RESOURCE_UPLOADED: str = "resource_uploaded"

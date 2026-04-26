@@ -1,16 +1,19 @@
-from pydantic import BaseModel
-from typing import List, Optional
+from pydantic import BaseModel, Field
+from typing import Annotated, List, Optional
 from app.schemas.common import IngestStatus
+
+UUID_PATTERN = r"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+UUIDStr = Annotated[str, Field(pattern=UUID_PATTERN)]
 
 
 # ── Ingestion ─────────────────────────────────────────────
 
 class IngestResponse(BaseModel):
-    resource_id: Optional[str] = None
+    resource_id: Optional[UUIDStr] = None
     version: Optional[str] = None
     filename: str
-    course_id: str
-    chapter_id: str
+    course_id: UUIDStr
+    chapter_id: UUIDStr
     pages_processed: Optional[int] = None
     chunks_indexed: int
     status: IngestStatus
@@ -19,11 +22,11 @@ class IngestResponse(BaseModel):
 
 
 class IngestStatusResponse(BaseModel):
-    resource_id: str
+    resource_id: UUIDStr
     version: str
     filename: str
-    course_id: str
-    chapter_id: str
+    course_id: UUIDStr
+    chapter_id: UUIDStr
     status: IngestStatus
     pages_processed: Optional[int] = None
     chunks_indexed: int
@@ -36,8 +39,8 @@ class IngestStatusResponse(BaseModel):
 
 class KnowledgeChunk(BaseModel):
     content: str
-    course_id: str
-    chapter_id: str
+    course_id: UUIDStr
+    chapter_id: UUIDStr
     source_file: str
     page: Optional[int] = None
     score: float
@@ -51,6 +54,6 @@ class KnowledgeSearchResponse(BaseModel):
 
 class KnowledgeSearchRequest(BaseModel):
     query: str
-    course_id: Optional[str] = None
-    chapter_id: Optional[str] = None
+    course_id: Optional[UUIDStr] = None
+    chapter_id: Optional[UUIDStr] = None
     top_k: int = 5

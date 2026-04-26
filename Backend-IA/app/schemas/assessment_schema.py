@@ -1,4 +1,4 @@
-from typing import List, Literal, Optional
+from typing import Annotated, List, Literal, Optional
 
 from pydantic import BaseModel, Field, model_validator
 from app.schemas.tutor_schema import ContextChunk, SourceChunk
@@ -6,13 +6,15 @@ from app.schemas.tutor_schema import ContextChunk, SourceChunk
 
 QuestionType = Literal["qcm", "vrai_faux", "ouverte"]
 DifficultyLevel = Literal["facile", "moyen", "difficile"]
+UUID_PATTERN = r"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+UUIDStr = Annotated[str, Field(pattern=UUID_PATTERN)]
 
 
 class AssessmentGenerateRequest(BaseModel):
 	topic: str = Field(..., min_length=3, max_length=2000)
-	course_id: Optional[str] = None
-	chapter_ids: Optional[List[str]] = None
-	chapter_id: Optional[str] = None
+	course_id: Optional[UUIDStr] = None
+	chapter_ids: Optional[List[UUIDStr]] = None
+	chapter_id: Optional[UUIDStr] = None
 
 	difficulty: DifficultyLevel = "moyen"
 	total_questions: int = Field(default=10, ge=1, le=50)
