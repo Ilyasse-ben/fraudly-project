@@ -22,7 +22,14 @@ Les valeurs par defaut appliquees:
 - `GROQ_MODEL=llama-3.3-70b-versatile`
 - `GEMINI_MODEL=gemini-2.0-flash`
 - `EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2`
-- `CHROMA_PATH=./chroma_db`
+- `CHROMA_PATH=./chroma_db_miniLM384`
+- `CHROMA_COLLECTION=fraudly_knowledge_miniLM384`
+- `VECTOR_STORE_BACKEND=chroma`
+
+Modes backend vectoriel:
+
+- `VECTOR_STORE_BACKEND=chroma` (recommande test/prod): ChromaDB persistant (SQLite + index)
+- `VECTOR_STORE_BACKEND=simple` (debug uniquement): store JSON local simplifie
 
 ## Contrat d'ingestion (Spring -> Backend-IA)
 

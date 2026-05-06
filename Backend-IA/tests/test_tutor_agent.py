@@ -4,12 +4,16 @@ from app.agents import tutor_agent
 from app.schemas.tutor_schema import TutorAskRequest
 
 
+COURSE_ID = "550e8400-e29b-41d4-a716-446655440000"
+CHAPTER_ID = "550e8400-e29b-41d4-a716-446655440001"
+
+
 class _FakeGraph:
     def invoke(self, _state):
         return {
             "question": "Qu'est-ce que la fraude documentaire ?",
-            "course_id": "fraude_101",
-            "chapter_id": "intro",
+            "course_id": COURSE_ID,
+            "chapter_id": CHAPTER_ID,
             "top_k": 3,
             "chunks": [
                 SimpleNamespace(
@@ -32,8 +36,8 @@ def test_ask_tutor_returns_visible_rag_context_and_audit(monkeypatch):
 
     req = TutorAskRequest(
         question="Qu'est-ce que la fraude documentaire ?",
-        course_id="fraude_101",
-        chapter_id="intro",
+        course_id=COURSE_ID,
+        chapter_id=CHAPTER_ID,
         top_k=3,
     )
 

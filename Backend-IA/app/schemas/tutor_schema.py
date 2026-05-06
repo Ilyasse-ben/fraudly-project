@@ -9,6 +9,8 @@ class TutorAskRequest(BaseModel):
     question: str = Field(..., min_length=3, max_length=2000)
     course_id: Optional[UUIDStr] = None
     chapter_id: Optional[UUIDStr] = None
+    student_id: Optional[UUIDStr] = None  
+    session_id: Optional[str] = None      
     top_k: int = Field(default=5, ge=1, le=20)
 
 

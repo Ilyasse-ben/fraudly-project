@@ -18,10 +18,13 @@ class Settings(BaseSettings):
     EMBEDDING_WARMUP_ON_STARTUP: bool = False
 
     # ── ChromaDB ──────────────────────────────────────────
-    CHROMA_PATH: str = "./chroma_db_miniLM384"
+    CHROMA_PATH: str = "./chroma_db_native_miniLM384"
     CHROMA_COLLECTION: str = "fraudly_knowledge_miniLM384"
     CHROMA_AUTO_RESET_ON_DIMENSION_MISMATCH: bool = True
-    VECTOR_STORE_BACKEND: str = "simple"
+    VECTOR_STORE_BACKEND: str = "chroma"
+    CHROMA_HTTP_HOST: str = ""
+    CHROMA_HTTP_PORT: int = 8001
+    CHROMA_HTTP_SSL: bool = False
 
     # ── Chunking ──────────────────────────────────────────
     CHUNK_SIZE: int = 800
@@ -49,7 +52,7 @@ class Settings(BaseSettings):
 
     # ── Kafka ─────────────────────────────────────────────
     KAFKA_ENABLED: bool = True
-    KAFKA_BOOTSTRAP_SERVERS: str = "localhost:9092"
+    KAFKA_BOOTSTRAP_SERVERS: str = "localhost:9094"
     KAFKA_GROUP_ID: str = "fraudly-ia-service"
     KAFKA_TOPIC_RESOURCE_UPLOADED: str = "resource_uploaded"
     KAFKA_TOPIC_EXAM_SUBMITTED: str = "exam_submitted"
@@ -60,6 +63,23 @@ class Settings(BaseSettings):
     KAFKA_TOPIC_FRAUD_ALERTS: str = "fraud_alerts"
     KAFKA_TOPIC_COLLUSION_SUSPECTED: str = "proctor.collusion_suspected"
     KAFKA_TOPIC_LEARNING_PATH_UPDATE: str = "learning_path_update"
+    KAFKA_TOPIC_STUDENT_BLOCKED: str = "tutor.student_blocked"
+
+    # ── Session Memory (Redis) ─────────────────────────
+    SESSION_MEMORY_ENABLED: bool = True
+    REDIS_URL: str = "redis://localhost:6379/0"
+    SESSION_MEMORY_TTL_SECONDS: int = 86400
+    SESSION_MEMORY_MAX_TURNS: int = 6
+
+    # ── Tutor monitor (student blocked detection) ───────
+    TUTOR_BLOCK_SIMILARITY_THRESHOLD: float = 0.78
+    TUTOR_BLOCK_MIN_TURNS: int = 4
+    TUTOR_BLOCK_LOOKBACK_WINDOW: int = 4
+    TUTOR_BLOCK_HIGH_SIM_COUNT_THRESHOLD: int = 3
+
+    # ── ANALYTICS Service ─────────────────────────────────
+    ANALYTICS_SERVICE_BASE_URL: str = "http://localhost:8081/api/analytics"
+    ANALYTICS_SERVICE_TIMEOUT_SECONDS: int = 5
 
     # ── AWS S3 ────────────────────────────────────────────
     S3_ENABLED: bool = False

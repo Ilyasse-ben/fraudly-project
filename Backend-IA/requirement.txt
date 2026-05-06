@@ -26,3 +26,6 @@ pydantic
 
 # Messaging
 kafka-python
+
+# Session memory
+redis

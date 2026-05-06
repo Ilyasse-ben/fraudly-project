@@ -217,11 +217,22 @@ def get_client() -> chromadb.ClientAPI:
         return _client
 
     if _client is None:
-        logger.info("[ChromaDB] Initialisation client persistant...")
-        _client = chromadb.PersistentClient(
-            path=settings.CHROMA_PATH,
-            settings=ChromaSettings(anonymized_telemetry=False),
-        )
+        if settings.CHROMA_HTTP_HOST:
+            logger.info(
+                f"[ChromaDB] Initialisation client HTTP sur "
+                f"{settings.CHROMA_HTTP_HOST}:{settings.CHROMA_HTTP_PORT}..."
+            )
+            _client = chromadb.HttpClient(
+                host=settings.CHROMA_HTTP_HOST,
+                port=settings.CHROMA_HTTP_PORT,
+                ssl=settings.CHROMA_HTTP_SSL,
+            )
+        else:
+            logger.info("[ChromaDB] Initialisation client persistant...")
+            _client = chromadb.PersistentClient(
+                path=settings.CHROMA_PATH,
+                settings=ChromaSettings(anonymized_telemetry=False),
+            )
         logger.info("[ChromaDB] Client prêt.")
     return _client
 

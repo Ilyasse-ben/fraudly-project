@@ -45,6 +45,16 @@ services:
     volumes:
       - redis-data:/data
 
+  chroma:
+    image: chromadb/chroma:latest
+    container_name: chroma
+    ports:
+      - '8001:8000'
+    networks:
+      - fraoudly-networks
+    volumes:
+      - chroma-data:/chroma/chroma
+
   authentification-service:
     container_name: authentification-service     
     build: ./Backend-Spring/authentification-service
@@ -57,20 +67,6 @@ services:
     networks:
       - fraoudly-networks
 
-
-  learning-service:
-    container_name: learning-service      
-    build: ./Backend-Spring/learning-service
-    ports:
-      - '8081:8080'
-    environment:
-      - DB_URL=jdbc:postgresql://pgdb:5432/mydb
-    depends_on:
-      - basse-de-donnes
-    networks:
-      - fraoudly-networks
-
-
   assessment-service:
     container_name: assessment-service      
     build: ./Backend-Spring/assessment-service
@@ -78,6 +74,20 @@ services:
       - '8082:8080'
     environment:
       - DB_URL=jdbc:postgresql://pgdb:5432/mydb
+    depends_on:
+      - basse-de-donnes
+    networks:
+      - fraoudly-networks
+    
+  analytics-service:
+    container_name: analytics-service      
+    build: ./Backend-Spring/analytics-service
+    ports:
+      - '8081:8081'
+    environment:
+      - DB_URL_ANALYTICS=jdbc:postgresql://pgdb:5432/fraudly_analytics
+      - DB_USER_ANALYTICS=fraudly
+      - DB_PASSWORD_ANALYTICS=fraudly
     depends_on:
       - basse-de-donnes
     networks:
@@ -112,6 +122,7 @@ volumes:
   fraoudly-volumes:
   kafka-data:
   redis-data:
+  chroma-data:
   
 
  

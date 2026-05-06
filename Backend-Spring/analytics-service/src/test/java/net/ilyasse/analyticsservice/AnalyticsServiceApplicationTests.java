@@ -1,10 +1,10 @@
-package net.ilyasse.learningservice;
+package net.ilyasse.analyticsservice;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class LearningServiceApplicationTests {
+class AnalyticsServiceApplicationTests {
 
     @Test
     void contextLoads() {
