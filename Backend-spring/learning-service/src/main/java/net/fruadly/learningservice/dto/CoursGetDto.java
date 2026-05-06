@@ -16,6 +16,7 @@ public class CoursGetDto {
     private UUID profId;
     // On peut ajouter un champ calculé pour le dashboard
     private Integer chapterCount;
+    private String coursCode;
     // Ajout de la liste pour la vue détaillée
     private List<Chapter> chapters;
     private List<Enrollment> enrollments;

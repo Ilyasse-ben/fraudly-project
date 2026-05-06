@@ -17,7 +17,6 @@ public class CourseMapper {
         dto.setDescription(entity.getDescription());
         dto.setCategory(entity.getCategory());
         dto.setProfId(entity.getProfId());
-
         return dto;
     }
     public CoursGetDto toGetDto(Cours entity) {
@@ -30,6 +29,7 @@ public class CourseMapper {
         dto.setProfId(entity.getProfId());
         dto.setChapters(entity.getChapters());
         dto.setEnrollments(entity.getEnrollments());
+        dto.setCoursCode(entity.getCoursCode());
         // Calcul du nombre de chapitres pour le dashboard
         dto.setChapterCount(entity.getChapters() != null ? entity.getChapters().size() : 0);
         return dto;

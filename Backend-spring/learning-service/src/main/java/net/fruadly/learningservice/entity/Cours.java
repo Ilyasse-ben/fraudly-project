@@ -19,6 +19,7 @@ public class Cours {
     private String description;
     private String category;
     private Date courseDate ;
+    private String coursCode;
     // ID provenant du service d'authentification
     private UUID profId;
 

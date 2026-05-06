@@ -9,7 +9,10 @@ import net.fruadly.learningservice.dto.CoursPostDto;
 import net.fruadly.learningservice.entity.Cours;
 import net.fruadly.learningservice.mapper.CourseMapper;
 import net.fruadly.learningservice.repository.CoursRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.security.SecureRandom;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -21,9 +24,26 @@ public class CoursService {
 
     private final CoursRepository courseRepository;
     private final CourseMapper courseMapper;
+    public  String generate(int length) {
+        final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        final SecureRandom RANDOM = new SecureRandom();
+        String token;
+        do {
+            StringBuilder sb = new StringBuilder(length);
+            for (int i = 0; i < length; i++) {
+                int index = RANDOM.nextInt(CHARACTERS.length());
+                sb.append(CHARACTERS.charAt(index));
+            }
+            token = sb.toString();
+        } while (courseRepository.existsByCoursCode(token));
+
+        return token;
+    }
 
     public CoursPostDto createCourse(CoursPostDto coursPostDto) {
         Cours cours = courseMapper.toEntity(coursPostDto);
+        String token=generate(8);
+        cours.setCoursCode(token);
         // Logique spécifique : un nouveau cours commence toujours à la version 1
         Cours savedCourse = courseRepository.save(cours);
         return courseMapper.toPostDto(savedCourse);

@@ -18,12 +18,12 @@ import java.util.UUID;
 
 public class EnrolementController {
     private final EnrollmentService enrollmentService;
-    @PostMapping("/{coursId}")
-    public ResponseEntity<EnrollmentDto> addUser(@PathVariable UUID coursId, @RequestBody EnrollmentDto dto){
-        EnrollmentDto enrollmentDto1=enrollmentService.addEnrollmentToCourse(coursId,dto);
+    @PostMapping("/{coursCode}")
+    public ResponseEntity<EnrollmentDto> addUser(@PathVariable String coursCode, @RequestBody EnrollmentDto dto){
+        EnrollmentDto enrollmentDto1=enrollmentService.addEnrollmentToCourse(coursCode,dto);
         return new ResponseEntity<>(enrollmentDto1, HttpStatus.CREATED);
     }
-    @DeleteMapping("/{coursId}")
+    @DeleteMapping("/{erolementId}")
     public ResponseEntity<Void> deleteUser(@PathVariable UUID erolementId){
         enrollmentService.removeEnrollmentToCourse(erolementId);
         return ResponseEntity.noContent().build();

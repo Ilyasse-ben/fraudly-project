@@ -2,9 +2,7 @@ package net.fruadly.learningservice.controller;
 
 import lombok.RequiredArgsConstructor;
 import net.fruadly.learningservice.dto.ChapitrDto;
-import net.fruadly.learningservice.dto.ResourceDto;
 import net.fruadly.learningservice.service.ChapitreService;
-import net.fruadly.learningservice.service.ResourceService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
