@@ -71,12 +71,17 @@ class CollusionDetector:
     SIMILARITY_THRESHOLD = 0.85
     
     def __init__(self):
-        """Initialise le détecteur avec le modèle d'embedding spécialisé."""
+        """Initialise le détecteur avec le modèle d'embedding spécialisé (lazy-load)."""
         self._model = None
-        self._load_model()
+        self._model_loaded_attempted = False
     
-    def _load_model(self) -> None:
-        """Charge le modèle de similarité."""
+    def _load_model(self) -> bool:
+        """Charge le modèle de similarité (lazy-load au premier appel).
+        Retourne True si succès, False si échec (utilise fallback)."""
+        if self._model_loaded_attempted:
+            return self._model is not None
+        
+        self._model_loaded_attempted = True
         try:
             from sentence_transformers import SentenceTransformer
             import torch
@@ -88,9 +93,33 @@ class CollusionDetector:
             logger.info(f"[Collusion] Chargement {self.COLLUSION_MODEL_NAME} sur {device}")
             self._model = SentenceTransformer(self.COLLUSION_MODEL_NAME, device=device)
             logger.info("[Collusion] Modèle de détection prêt")
+            return True
         except Exception as e:
-            logger.error(f"[Collusion] Erreur chargement modèle: {e}")
-            raise
+            logger.warning(f"[Collusion] Impossible charger modèle (fallback activé): {e}")
+            return False
+    
+    def _simple_similarity_fallback(self, texts: List[str]) -> "numpy.ndarray":
+        """Fallback: Calcule la similarité basée sur les mots communs (Jaccard).
+        Retourne une matrice de similarité N×N."""
+        import numpy as np
+        
+        n = len(texts)
+        similarity_matrix = np.zeros((n, n))
+        
+        # Tokenize simple: split par espaces et minuscules
+        word_sets = [set(text.lower().split()) for text in texts]
+        
+        for i in range(n):
+            for j in range(n):
+                if i == j:
+                    similarity_matrix[i, j] = 1.0
+                else:
+                    # Jaccard similarity
+                    intersection = len(word_sets[i] & word_sets[j])
+                    union = len(word_sets[i] | word_sets[j])
+                    similarity_matrix[i, j] = intersection / union if union > 0 else 0.0
+        
+        return similarity_matrix
     
     def detect_collusion_pairs(
         self,
@@ -118,11 +147,17 @@ class CollusionDetector:
         texts = [ans.full_text or ans.answer_text for ans in answers]
         
         try:
-            # Encode tous les textes
-            embeddings = self._model.encode(texts, convert_to_numpy=True)
+            # Lazy-load du modèle (au premier appel)
+            model_available = self._load_model()
             
-            # Calcule la matrice de similarité cosinus
-            similarity_matrix = cosine_similarity(embeddings)
+            if model_available:
+                # Utilise le modèle transformer si disponible
+                embeddings = self._model.encode(texts, convert_to_numpy=True)
+                similarity_matrix = cosine_similarity(embeddings)
+            else:
+                # Fallback: similarité simple (substring matching)
+                logger.info("[Collusion] Utilisant fallback (string similarity)")
+                similarity_matrix = self._simple_similarity_fallback(texts)
             
             # Extrait les paires > threshold
             suspicious_pairs = []

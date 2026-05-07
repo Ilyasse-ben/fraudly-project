@@ -48,6 +48,8 @@ public class S3Service {
     private ResourceMapper resourceMapper;
     @Autowired
     private ChapterRepository chapterRepository;
+    @Autowired
+    private net.fruadly.learningservice.kafka.ResourceProducer resourceProducer;
 
     // la méthode qui uplode le ficher en cloude
     public ResourceDto uplodFile(MultipartFile file,String type, Chapter chapter){
@@ -60,7 +62,8 @@ public class S3Service {
                     .key(fileName)
                     .contentType(file.getContentType())
                     .build();
-            s3Client.putObject(request, RequestBody.fromBytes(file.getBytes()));
+            byte[] bytes = file.getBytes();
+            s3Client.putObject(request, RequestBody.fromBytes(bytes));
             // Utilise l'utilitaire AWS pour récupérer l'URL propre
             GetUrlRequest getUrlRequest = GetUrlRequest.builder()
                     .bucket(bucketName)
@@ -71,7 +74,19 @@ public class S3Service {
             resource.setFileUrl(urlFile);
             resource.setMimeType(type);
             resource.setChapter(chapter);
-            return resourceMapper.toDto(resourceRepository.save(resource));
+            ResourceDto dto = resourceMapper.toDto(resourceRepository.save(resource));
+
+            // Publish Kafka event for resource_uploaded with base64 content
+            try {
+                String courseId = chapter.getCours() != null && chapter.getCours().getId() != null ? chapter.getCours().getId().toString() : null;
+                String chapterId = chapter.getId() != null ? chapter.getId().toString() : null;
+                resourceProducer.publishResource(dto, bytes, courseId, chapterId);
+            } catch (Exception ex) {
+                // Do not fail the upload on kafka errors
+                System.err.println("Warning: failed to publish resource_uploaded event: " + ex.getMessage());
+            }
+
+            return dto;
         } catch (Exception e) {
             throw new RuntimeException("Erreur S3: " + e.getMessage(), e);
         }

@@ -14,7 +14,7 @@ import java.net.URI;
 
 @Configuration
 public class AwsConf {
-    @Value("${aws.accessKey}")
+    @Value("${aws.accessKey}") 
     private String accessKey;
 
     @Value("${aws.secretKey}")
