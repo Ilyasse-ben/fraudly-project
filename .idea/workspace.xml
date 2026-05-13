@@ -5,11 +5,56 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ba3b6392-28ce-4097-8401-e0b0517826ae" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Backend-Spring/learning-service/src/main/java/net/enset/learningservice/entity/Cours.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Backend-Spring/learning-service/src/main/java/net/enset/learningservice/entity/Inscription.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Backend-Spring/learning-service/src/main/java/net/enset/learningservice/entity/Leçons.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Backend-Spring/learning-service/src/main/java/net/ilyasse/learningservice/LearningServiceApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend-Spring/learning-service/src/main/java/net/enset/learningservice/LearningServiceApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Backend-Spring/learning-service/src/test/java/net/ilyasse/learningservice/LearningServiceApplicationTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend-Spring/learning-service/src/test/java/net/enset/learningservice/LearningServiceApplicationTests.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Frontend/.postcssrc.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Frontend/html.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Frontend/src/app/allcours/allcours.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Frontend/src/app/allcours/allcours.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Frontend/src/app/allcours/allcours.spec.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Frontend/src/app/allcours/allcours.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Frontend/src/app/assistant/assistant.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Frontend/src/app/assistant/assistant.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Frontend/src/app/assistant/assistant.spec.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Frontend/src/app/assistant/assistant.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Frontend/src/app/chapiter/chapiter.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Frontend/src/app/chapiter/chapiter.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Frontend/src/app/chapiter/chapiter.spec.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Frontend/src/app/chapiter/chapiter.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Frontend/src/app/cours/cours.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Frontend/src/app/cours/cours.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Frontend/src/app/cours/cours.spec.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Frontend/src/app/cours/cours.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Frontend/src/app/createcours/createcours.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Frontend/src/app/createcours/createcours.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Frontend/src/app/createcours/createcours.spec.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Frontend/src/app/createcours/createcours.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Frontend/src/app/dashbord-prof/dashbord-prof.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Frontend/src/app/dashbord-prof/dashbord-prof.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Frontend/src/app/dashbord-prof/dashbord-prof.spec.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Frontend/src/app/dashbord-prof/dashbord-prof.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Frontend/src/app/examen/examen.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Frontend/src/app/examen/examen.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Frontend/src/app/examen/examen.spec.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Frontend/src/app/examen/examen.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Frontend/src/app/list-etudient-cours/list-etudient-cours.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Frontend/src/app/list-etudient-cours/list-etudient-cours.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Frontend/src/app/list-etudient-cours/list-etudient-cours.spec.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Frontend/src/app/list-etudient-cours/list-etudient-cours.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Frontend/src/app/list-exemane/list-exemane.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Frontend/src/app/list-exemane/list-exemane.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Frontend/src/app/list-exemane/list-exemane.spec.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Frontend/src/app/list-exemane/list-exemane.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Frontend/src/app/service/coursService/cours-service.spec.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Frontend/src/app/service/coursService/cours-service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend-spring/learning-service/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Backend-spring/learning-service/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend-spring/learning-service/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/Backend-spring/learning-service/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/src/app/app.html" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/src/app/app.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/src/app/app.routes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/src/app/app.routes.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/src/app/app.ts" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/src/app/app.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/src/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/src/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/src/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/src/styles.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -33,9 +78,9 @@
       </MavenGeneralSettings>
     </option>
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 5
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 5
+}</component>
   <component name="ProjectId" id="3C59jNk160hcmoplwH4iuhnmyMY" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -45,12 +90,26 @@
   "keyToString": {
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "Spring Boot.AssessmentServiceApplication.executor": "Run",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "Rebasing backend-spring",
     "kotlin-language-version-configured": "true"
   }
 }]]></component>
+  <component name="RunManager">
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="fraudly-project" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <module name="fraudly-project" />
+      <option name="filePath" />
+      <method v="2" />
+    </configuration>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>

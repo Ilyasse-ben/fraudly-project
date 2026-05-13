@@ -1,0 +1,217 @@
+<div class="flex-1 p-12">
+
+    <!-- PAGE TITLE -->
+
+    <div class="mb-10">
+
+        <h1 class="text-5xl font-bold mb-3">
+            Liste des étudiant
+        </h1>
+
+        <p class="text-slate-500 text-lg">
+            Select a course to view enrolled students
+        </p>
+
+    </div>
+
+    <!-- LAYOUT -->
+
+    <div class="grid grid-cols-12 gap-8">
+
+        <!-- LEFT : COURSES -->
+
+        <div class="col-span-4">
+
+            <div class="space-y-5">
+
+                <!-- COURSE CARD -->
+
+                <div onclick="showStudents('ml')"
+                    class="cursor-pointer bg-blue-50 border-2 border-blue-50 rounded-3xl p-7 hover:shadow-xl transition">
+
+                    <div class="flex items-center justify-between mb-4">
+
+                        <span class="px-4 py-2 rounded-full bg-blue-50 text-blue-600 text-sm font-semibold">
+                            AI Course
+                        </span>
+
+                        <span class="text-slate-500 text-sm">
+                            420 Students
+                        </span>
+
+                    </div>
+
+                    <h2 class="text-2xl font-bold mb-3">
+                        Machine Learning
+                    </h2>
+
+                    <p class="text-slate-500 leading-7">
+                        Neural networks, supervised learning and deep learning fundamentals.
+                    </p>
+
+                </div>
+
+                <!-- COURSE -->
+
+                <div onclick="showStudents('cloud')"
+                    class="cursor-pointer bg-white border border-blue-50 rounded-3xl p-7 hover:shadow-xl transition hover:border-blue-400">
+
+                    <div class="flex items-center justify-between mb-4">
+
+                        <span class="px-4 py-2 rounded-full bg-blue-50 text-blue-600 text-sm font-semibold">
+                            Cloud
+                        </span>
+
+                        <span class="text-slate-500 text-sm">
+                            320 Students
+                        </span>
+
+                    </div>
+
+                    <h2 class="text-2xl font-bold mb-3">
+                        Cloud Computing
+                    </h2>
+
+                    <p class="text-slate-500 leading-7">
+                        AWS infrastructure, Docker and Kubernetes orchestration.
+                    </p>
+
+                </div>
+
+                <!-- COURSE -->
+
+                <div onclick="showStudents('security')"
+                    class="cursor-pointer bg-white border border-blue-50 rounded-3xl p-7 hover:shadow-xl transition hover:border-blue-400">
+
+                    <div class="flex items-center justify-between mb-4">
+
+                        <span class="px-4 py-2 rounded-full bg-blue-50 text-blue-600 text-sm font-semibold">
+                            Security
+                        </span>
+
+                        <span class="text-slate-500 text-sm">
+                            280 Students
+                        </span>
+
+                    </div>
+
+                    <h2 class="text-2xl font-bold mb-3">
+                        Cyber Security
+                    </h2>
+
+                    <p class="text-slate-500 leading-7">
+                        Ethical hacking, penetration testing and secure systems.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- RIGHT : STUDENTS -->
+
+        <div class="col-span-8">
+
+            <div class="bg-white border border-slate-200 rounded-3xl p-8 min-h-[700px]">
+
+                <!-- TITLE -->
+
+                <div class="flex items-center justify-between mb-8">
+
+                    <div>
+
+                        <h2 class="text-3xl font-bold mb-2" id="course-title">
+                            Machine Learning Students
+                        </h2>
+
+                        <p class="text-slate-500">
+                            List of enrolled students
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <!-- STUDENTS LIST -->
+
+                <div class="space-y-5 max-h-[500px] overflow-y-auto pr-2" id="students-container">
+
+                    <!-- STUDENT -->
+
+                    <div
+                        class="flex items-center justify-between border border-slate-200 rounded-2xl p-5 hover:bg-slate-50 transition">
+
+                        <div class="flex items-center gap-4">
+
+                            <div
+                                class="w-14 h-14 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
+                                IB
+                            </div>
+
+                            <div>
+
+                                <h3 class="font-semibold text-lg">
+                                    Ilyasse Ben Taleb
+                                </h3>
+
+                                <p class="text-slate-500 text-sm">
+                                    ilyasse@example.com
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                        <button
+                            class="px-4 py-2 rounded-xl bg-red-500 hover:bg-red-600 transition text-white text-sm font-medium">
+
+                            Remove
+
+                        </button>
+
+                    </div>
+
+                    <!-- STUDENT -->
+
+                    <div
+                        class="flex items-center justify-between border border-slate-200 rounded-2xl p-5 hover:bg-slate-50 transition">
+
+                        <div class="flex items-center gap-4">
+
+                            <div
+                                class="w-14 h-14 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
+                                AK
+                            </div>
+
+                            <div>
+
+                                <h3 class="font-semibold text-lg">
+                                    Ahmed Karim
+                                </h3>
+
+                                <p class="text-slate-500 text-sm">
+                                    ahmed@example.com
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                        <button
+                            class="px-4 py-2 rounded-xl bg-red-500 hover:bg-red-600 transition text-white text-sm font-medium">
+
+                            Remove
+
+                        </button>
+
+                    </div>
+                    
+
+                </div>
+
+            </div>
+
+        </div>
+
+</div>

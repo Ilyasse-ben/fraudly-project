@@ -8,7 +8,7 @@ RUN mvn clean package -DskipTests
 
 
 # image de l'application
-FROM openjdk:17.0.2-jdk
+FROM eclipse-temurin:21-jre
 VOLUME /tmp
 COPY --from=builder /app/target/*.jar  app.jar
 EXPOSE 8084
