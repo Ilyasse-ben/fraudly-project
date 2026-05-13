@@ -55,6 +55,9 @@
       <change beforePath="$PROJECT_DIR$/Frontend/src/app/app.ts" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/src/app/app.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Frontend/src/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/src/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Frontend/src/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/src/styles.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend-spring/learning-service/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Backend-spring/learning-service/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend-spring/learning-service/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/Backend-spring/learning-service/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/compose.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/compose.yaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -94,6 +97,8 @@
     "RunOnceActivity.git.unshallow": "true",
     "Spring Boot.AssessmentServiceApplication.executor": "Run",
     "git-widget-placeholder": "Rebasing backend-spring",
+    "git-widget-placeholder": "backend-spring",
+     1a61e6a (version 1 frontend)
     "kotlin-language-version-configured": "true"
   }
 }]]></component>
