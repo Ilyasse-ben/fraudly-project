@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 /**
  * @author ELHAID Yousef
  **/
@@ -17,6 +19,15 @@ import lombok.NoArgsConstructor;
 public class AuthResponse {
     private String accessToken;
     private String refreshToken;
+    private UUID userId;
     private String email;
     private String role;
+
+    public UUID getUserId() {
+        return userId;
+    }
+
+    public void setUserId(UUID userId) {
+        this.userId = userId;
+    }
 }

@@ -2,6 +2,9 @@ package net.enset.authentificationservice.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -17,6 +20,8 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @JdbcTypeCode(SqlTypes.UUID)
+    @Column(nullable = false, updatable = false, unique = true)
     private UUID id;
 
     @Column(nullable = false, unique = true)
