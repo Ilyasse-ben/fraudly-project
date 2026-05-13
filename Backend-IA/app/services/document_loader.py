@@ -24,7 +24,10 @@ import fitz
 import pytesseract
 from PIL import Image
 from docx import Document as DocxDocument
-from pptx import Presentation
+try:
+    from pptx import Presentation
+except Exception:
+    Presentation = None
 from typing import List, Dict, Any, Optional
 
 from app.schemas.common import DocumentType
@@ -280,7 +283,12 @@ def load_docx(file_path: str) -> List[Dict[str, Any]]:
 
 def load_pptx(file_path: str) -> List[Dict[str, Any]]:
     """Texte slide + OCR images par slide."""
-    prs   = Presentation(file_path)
+    if Presentation is None:
+        raise ImportError(
+            "python-pptx n'est pas installé. Installer avec: pip install python-pptx"
+        )
+
+    prs = Presentation(file_path)
     pages = []
     logger.info(f"[Loader] PPTX — {len(prs.slides)} slides")
 

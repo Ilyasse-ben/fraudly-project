@@ -222,11 +222,20 @@ def get_client() -> chromadb.ClientAPI:
                 f"[ChromaDB] Initialisation client HTTP sur "
                 f"{settings.CHROMA_HTTP_HOST}:{settings.CHROMA_HTTP_PORT}..."
             )
-            _client = chromadb.HttpClient(
-                host=settings.CHROMA_HTTP_HOST,
-                port=settings.CHROMA_HTTP_PORT,
-                ssl=settings.CHROMA_HTTP_SSL,
-            )
+            try:
+                _client = chromadb.HttpClient(
+                    host=settings.CHROMA_HTTP_HOST,
+                    port=settings.CHROMA_HTTP_PORT,
+                    ssl=settings.CHROMA_HTTP_SSL,
+                )
+            except Exception as error:
+                logger.warning(
+                    f"[ChromaDB] Serveur HTTP indisponible ({error})"
+                )
+                _client = chromadb.PersistentClient(
+                    path=settings.CHROMA_PATH,
+                    settings=ChromaSettings(anonymized_telemetry=False),
+                )
         else:
             logger.info("[ChromaDB] Initialisation client persistant...")
             _client = chromadb.PersistentClient(

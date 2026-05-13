@@ -8,9 +8,7 @@ IMPORTANT sur les préfixes "query:" / "passage:" :
     dégradation silencieuse de la qualité du retrieval.
 """
 
-from sentence_transformers import SentenceTransformer
-from typing import List, Optional
-import torch
+from typing import List, Optional, Any
 import time
 import numpy as np
 
@@ -19,7 +17,7 @@ from app.core.logger import get_logger
 
 logger = get_logger(__name__)
 
-_model: Optional[SentenceTransformer] = None
+_model: Optional[Any] = None
 
 # Modèles E5 qui nécessitent les préfixes "query:" / "passage:".
 # Tout autre modèle ne doit PAS recevoir ces préfixes.
@@ -34,13 +32,27 @@ def _requires_e5_prefix() -> bool:
 # ─────────────────────────────
 # MODEL SINGLETON
 # ─────────────────────────────
-def get_embedding_model() -> SentenceTransformer:
+def get_embedding_model() -> Any:
     global _model
 
     if _model is None:
+        # Import heavy libraries lazily to avoid import-time failures in environments
+        # where torch / sentence-transformers are not available (CI, machines
+        # without GPU drivers, or when running light unit tests).
+        try:
+            from sentence_transformers import SentenceTransformer
+        except Exception as e:
+            logger.exception("[Embedding] Impossible d'importer sentence_transformers: %s", e)
+            raise
+
+        try:
+            import torch
+        except Exception:
+            torch = None
+
         device = settings.EMBEDDING_DEVICE
 
-        if device == "cuda" and not torch.cuda.is_available():
+        if device == "cuda" and (torch is None or not getattr(torch, "cuda", None) or not torch.cuda.is_available()):
             logger.warning("[Embedding] CUDA demandé mais indisponible → fallback CPU")
             device = "cpu"
 
@@ -53,7 +65,7 @@ def get_embedding_model() -> SentenceTransformer:
                 "Vérifiez que cela correspond au comportement attendu."
             )
 
-        start  = time.time()
+        start = time.time()
         _model = SentenceTransformer(settings.EMBEDDING_MODEL, device=device)
 
         logger.info(f"[Embedding] Modèle prêt en {time.time() - start:.2f}s")
@@ -132,7 +144,7 @@ def embed_query(query: str) -> List[float]:
         raise
 
 
-def warm_up_model() -> SentenceTransformer:
+def warm_up_model() -> Any:
     """
     Compatibilité ascendante: précharge le modèle d'embedding.
     Conservé pour les scripts manuels (ex: test_rag.py).
