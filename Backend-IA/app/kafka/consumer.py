@@ -144,6 +144,7 @@ async def consume_resources():
                 result = ingest_bytes(
                     file_bytes=file_bytes,
                     filename=filename,
+                    resource_id=resource_id,
                     course_id=course_id,
                     chapter_id=chapter_id,
                     doc_type=doc_type,
@@ -155,6 +156,8 @@ async def consume_resources():
                 )
                 
                 # Publie le résultat sur AI_RESULTS topic
+                logger.info(f"[Kafka] Ingest result object for {resource_id}: {result}")
+                logger.info(f"[Kafka] Ingest result.vector_id for {resource_id}: {getattr(result, 'vector_id', None)}")
                 _publish_ingest_result(resource_id, result)
                 
             except Exception as e:
@@ -188,11 +191,13 @@ def _publish_ingest_result(resource_id: str, result):
             "status": result.status,
             "chunks_indexed": result.chunks_indexed,
             "pages_processed": result.pages_processed,
+            "vector_id": getattr(result, "vector_id", None),
         }
         
+        logger.info(f"[Kafka] Publishing ai_results message: {msg}")
         producer.send(settings.KAFKA_TOPIC_AI_RESULTS, msg)
         producer.close()
-        
+
         logger.info(f"[Kafka] Résultat publié pour {resource_id}")
     except Exception as e:
         logger.error(f"[Kafka] Erreur publication résultat: {e}")
@@ -203,3 +208,65 @@ def stop_consumer():
     global _running
     _running = False
     logger.info("[Kafka] Arrêt consumer demandé")
+
+def _run_consumer_sync():
+    """Version synchrone bloquante — tourne dans un thread séparé."""
+    global _running
+
+    consumer = get_consumer()
+    if not consumer:
+        logger.warning("[Kafka] KAFKA_ENABLED=False, consumer désactivé")
+        return
+
+    _running = True
+    logger.info("[Kafka] Démarrage consumer...")
+
+    try:
+        for msg in consumer:
+            if not _running:
+                break
+            try:
+                event = msg.value
+                logger.info(f"[Kafka] Message reçu: {event.get('resource_id', 'unknown')}")
+                resource_id, course_id, chapter_id, filename, file_bytes = _parse_resource_event(event)
+
+                if not course_id or not chapter_id:
+                    logger.warning(f"[Kafka] Métadonnées manquantes pour {resource_id}")
+                    continue
+
+                doc_type = _get_document_type(filename)
+                result = ingest_bytes(
+                    file_bytes=file_bytes,
+                    filename=filename,
+                    resource_id=resource_id,
+                    course_id=course_id,
+                    chapter_id=chapter_id,
+                    doc_type=doc_type,
+                )
+                logger.info(f"[Kafka] ✓ {result.chunks_indexed} chunks indexés")
+                _publish_ingest_result(resource_id, result)
+
+            except Exception as e:
+                logger.error(f"[Kafka] Erreur processing message: {e}")
+                continue
+    except Exception as e:
+        logger.error(f"[Kafka] Erreur consumer: {e}")
+    finally:
+        if consumer:
+            consumer.close()
+        _running = False
+
+
+async def run_resource_consumer_loop() -> None:
+    """
+    Wrapper async NON-BLOQUANT — tourne le consumer dans un thread séparé.
+    """
+    loop = asyncio.get_event_loop()
+    try:
+        await loop.run_in_executor(None, _run_consumer_sync)
+    except asyncio.CancelledError:
+        logger.info("[Kafka] Resource consumer loop annulée")
+        stop_consumer()
+    except Exception as e:
+        logger.error(f"[Kafka] Erreur resource consumer loop: {e}")
+        stop_consumer()

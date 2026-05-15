@@ -246,6 +246,7 @@ async def ingest_document(
         result = ingest_bytes(
             file_bytes=file_content,
             filename=file.filename,
+            resource_id=resolved_resource_id,
             course_id=course_id,
             chapter_id=chapter_id,
             doc_type=doc_type,

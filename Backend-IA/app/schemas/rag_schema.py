@@ -16,6 +16,7 @@ class IngestResponse(BaseModel):
     chapter_id: UUIDStr
     pages_processed: Optional[int] = None
     chunks_indexed: int
+    vector_id: Optional[str] = None
     status: IngestStatus
     idempotent_hit: bool = False
     message: Optional[str] = None

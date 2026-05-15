@@ -6,23 +6,50 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import net.fruadly.learningservice.enums.IngestionStatus;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
 @Table(name = "resources")
-
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Resource {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
+
     private String fileName;
-    private String fileUrl; // Stockage AWS S3 [cite: 102]
-    private String mimeType; // PDF, DOCX, etc. [cite: 76]
+
+    private String fileUrl;
+
+    private String mimeType;
+
     @Column(columnDefinition = "TEXT")
-    private String extractedText; // Pour l'IA (OCR) [cite: 76, 79]
-    private String vectorId; // Lien vers Pinecone/Weaviate [cite: 79, 102]
+    private String extractedText;
+
+    private String vectorId;
+
+
+    @Enumerated(EnumType.STRING)
+    private IngestionStatus ingestionStatus;
+
+    /**
+     * IA indexing metadata
+     */
+    private Integer chunksIndexed;
+
+    private Integer pagesProcessed;
+
+    @Column(columnDefinition = "TEXT")
+    private String ingestionError;
+
+    private LocalDateTime indexedAt;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chapter_id")
     @JsonIgnore

@@ -3,115 +3,125 @@ package net.fruadly.learningservice.service;
 import lombok.RequiredArgsConstructor;
 import net.fruadly.learningservice.dto.ResourceDto;
 import net.fruadly.learningservice.entity.Chapter;
-import net.fruadly.learningservice.entity.Cours;
 import net.fruadly.learningservice.entity.Resource;
+import net.fruadly.learningservice.enums.IngestionStatus;
 import net.fruadly.learningservice.mapper.ResourceMapper;
 import net.fruadly.learningservice.repository.ChapterRepository;
 import net.fruadly.learningservice.repository.ResourceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import software.amazon.awssdk.auth.credentials.AwsSessionCredentials;
-import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.sync.RequestBody;
-import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetUrlRequest;
-import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
-import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
-import java.net.URI;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class S3Service {
-    @Value("${aws.bucketName}")
-    private String bucketName;
-    @Value("${aws.region}")
-    private String region;
-    @Value("${aws.accessKey}")
-    private String accessKey;
 
-    @Value("${aws.secretKey}")
-    private String secretKey;
-    @Value("${aws.sessionToken}")
-    private String sessionToken;
     @Autowired
     private S3Client s3Client;
+
     @Autowired
     private ResourceRepository resourceRepository;
+
     @Autowired
     private ResourceMapper resourceMapper;
+
     @Autowired
     private ChapterRepository chapterRepository;
+
     @Autowired
     private net.fruadly.learningservice.kafka.ResourceProducer resourceProducer;
 
-    // la méthode qui uplode le ficher en cloude
-    public ResourceDto uplodFile(MultipartFile file,String type, Chapter chapter){
-        try {
+    public ResourceDto uplodFile(MultipartFile file, String type, Chapter chapter) {
 
-            Resource resource=new Resource();
+        Resource resource = new Resource();
+        resource.setFileName(file.getOriginalFilename());
+        resource.setMimeType(type);
+        resource.setChapter(chapter);
+        resource.setIngestionStatus(IngestionStatus.PROCESSING);
+
+        Resource saved = resourceRepository.save(resource);
+
+        try {
             String fileName = UUID.randomUUID() + "-" + file.getOriginalFilename();
+            byte[] bytes = file.getBytes();
+
             PutObjectRequest request = PutObjectRequest.builder()
-                    .bucket(bucketName)
+                    .bucket("your-bucket") // garde ton @Value si tu veux
                     .key(fileName)
                     .contentType(file.getContentType())
                     .build();
-            byte[] bytes = file.getBytes();
+
             s3Client.putObject(request, RequestBody.fromBytes(bytes));
-            // Utilise l'utilitaire AWS pour récupérer l'URL propre
+
             GetUrlRequest getUrlRequest = GetUrlRequest.builder()
-                    .bucket(bucketName)
+                    .bucket("your-bucket")
                     .key(fileName)
                     .build();
-            String urlFile=s3Client.utilities().getUrl(getUrlRequest).toString();
-            resource.setFileName(file.getOriginalFilename());
-            resource.setFileUrl(urlFile);
-            resource.setMimeType(type);
-            resource.setChapter(chapter);
-            ResourceDto dto = resourceMapper.toDto(resourceRepository.save(resource));
 
-            // Publish Kafka event for resource_uploaded with base64 content
-            try {
-                String courseId = chapter.getCours() != null && chapter.getCours().getId() != null ? chapter.getCours().getId().toString() : null;
-                String chapterId = chapter.getId() != null ? chapter.getId().toString() : null;
-                resourceProducer.publishResource(dto, bytes, courseId, chapterId);
-            } catch (Exception ex) {
-                // Do not fail the upload on kafka errors
-                System.err.println("Warning: failed to publish resource_uploaded event: " + ex.getMessage());
-            }
+            String urlFile = s3Client.utilities().getUrl(getUrlRequest).toString();
 
-            return dto;
-        } catch (Exception e) {
-            throw new RuntimeException("Erreur S3: " + e.getMessage(), e);
-        }
-    }
-    // cette méthode permet de stoker le lein
-    public ResourceDto uplodLien(String lien,String type, Chapter chapter){
-        try {
+            saved.setFileUrl(urlFile);
+            saved.setIngestionStatus(IngestionStatus.PROCESSING);
+            resourceRepository.save(saved);
 
-            Resource resource=new Resource();
-            resource.setFileName(lien);
-            resource.setFileUrl(lien);
-            resource.setMimeType(type);
-            resource.setChapter(chapter);
-            return resourceMapper.toDto(resourceRepository.save(resource));
-        } catch (Exception e) {
-            throw new RuntimeException("Erreur " + e.getMessage(), e);
+            // 2. Kafka event
+            String courseId = chapter.getCours() != null ? chapter.getCours().getId().toString() : null;
+            String chapterId = chapter.getId() != null ? chapter.getId().toString() : null;
+
+            resourceProducer.publishResource(
+                    resourceMapper.toDto(saved),
+                    bytes,
+                    courseId,
+                    chapterId
+            );
+
+            return resourceMapper.toDto(saved);
+
+        } catch (Exception ex) {
+
+            Resource db = resourceRepository.findById(saved.getId())
+                    .orElse(saved);
+
+            db.setIngestionStatus(IngestionStatus.FAILED);
+            db.setIngestionError(ex.getMessage());
+
+            resourceRepository.save(db);
+
+            throw new RuntimeException("Erreur S3: " + ex.getMessage(), ex);
         }
     }
 
-    public ResourceDto uploadResource(MultipartFile file,String type,String lien, UUID chapterId) throws IOException {
+    public ResourceDto uplodLien(String lien, String type, Chapter chapter) {
 
-            Chapter chapter = chapterRepository.findById(chapterId).orElseThrow(() -> new RuntimeException("chapitre non trouvé"));
+        Resource resource = new Resource();
+        resource.setFileName(lien);
+        resource.setFileUrl(lien);
+        resource.setMimeType(type);
+        resource.setChapter(chapter);
+        resource.setIngestionStatus(IngestionStatus.READY);
+        resource.setIndexedAt(LocalDateTime.now());
 
-            return type.equals("lien")?this.uplodLien(lien,type,chapter): this.uplodFile(file,type,chapter);
+        Resource saved = resourceRepository.save(resource);
+
+        return resourceMapper.toDto(saved);
     }
 
+    public ResourceDto uploadResource(MultipartFile file, String type, String lien, UUID chapterId)
+            throws IOException {
 
+        Chapter chapter = chapterRepository.findById(chapterId)
+                .orElseThrow(() -> new RuntimeException("chapitre non trouvé"));
+
+        return type.equals("lien")
+                ? uplodLien(lien, type, chapter)
+                : uplodFile(file, type, chapter);
+    }
 }

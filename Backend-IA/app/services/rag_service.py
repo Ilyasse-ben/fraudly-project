@@ -44,6 +44,7 @@ MAX_CONTEXT_CHARS = 12_000
 def ingest_file(
     file_path: str,
     filename: str,
+    resource_id: Optional[str],
     course_id: str,
     chapter_id: str,
     doc_type: DocumentType,
@@ -65,19 +66,21 @@ def ingest_file(
                 course_id=course_id,
                 chapter_id=chapter_id,
                 chunks_indexed=0,
+                vector_id=None,
                 status=IngestStatus.EMPTY,
                 message="Aucun texte extractible.",
             )
 
         logger.info(f"[RAG] Pages extraites: {len(pages)}")
 
-        chunks = chunk_pages(pages, course_id, chapter_id, filename)
+        chunks = chunk_pages(pages, resource_id or str(uuid.uuid4()), course_id, chapter_id, filename)
         if not chunks:
             return IngestResponse(
                 filename=filename,
                 course_id=course_id,
                 chapter_id=chapter_id,
                 chunks_indexed=0,
+                vector_id=None,
                 status=IngestStatus.EMPTY,
             )
 
@@ -95,6 +98,9 @@ def ingest_file(
             f"{course_id}_{chapter_id}_{i}_{uuid.uuid4().hex[:8]}"
             for i in range(len(chunks))
         ]
+
+        # Representative vector id for this ingestion (first chunk id if available)
+        vector_id = ids[0] if ids else None
 
         logger.info(f"[RAG] Indexation ChromaDB → {len(ids)} chunks...")
         t0 = time.time()
@@ -133,6 +139,7 @@ def ingest_file(
             chapter_id=chapter_id,
             pages_processed=len(pages),
             chunks_indexed=len(chunks),
+            vector_id=vector_id,
             status=IngestStatus.OK,
         )
 
@@ -143,6 +150,7 @@ def ingest_file(
             course_id=course_id,
             chapter_id=chapter_id,
             chunks_indexed=0,
+            vector_id=None,
             status=IngestStatus.ERROR,
             message=str(e),
         )
@@ -155,6 +163,7 @@ def ingest_file(
 def ingest_bytes(
     file_bytes: bytes,
     filename: str,
+    resource_id: Optional[str],
     course_id: str,
     chapter_id: str,
     doc_type: DocumentType,
@@ -170,7 +179,7 @@ def ingest_bytes(
         with tempfile.NamedTemporaryFile(delete=False, suffix=f".{doc_type.value}") as tmp:
             tmp.write(file_bytes)
             tmp_path = tmp.name
-        return ingest_file(tmp_path, filename, course_id, chapter_id, doc_type)
+        return ingest_file(tmp_path, filename, resource_id, course_id, chapter_id, doc_type)
     finally:
         if tmp_path and os.path.exists(tmp_path):
             try:

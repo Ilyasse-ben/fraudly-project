@@ -92,6 +92,8 @@ class Settings(BaseSettings):
     UPLOAD_DIR: str = "./uploads"
     INGESTION_DB_PATH: str = "./data/ingestion.db"
 
+    # ── Security ───────────────────────────────────────────
+    JWT_SECRET: str = ""
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"

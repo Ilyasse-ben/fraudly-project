@@ -21,6 +21,7 @@ def _split_paragraphs(text: str) -> List[str]:
 
 
 def _make_metadata(
+    resource_id: str,
     course_id: str,
     chapter_id: str,
     filename: str,
@@ -28,6 +29,7 @@ def _make_metadata(
 ) -> Dict[str, Any]:
     """Construit le dict metadata ChromaDB — factorisé pour éviter la duplication."""
     return {
+        "resource_id": resource_id,
         "course_id":   course_id,
         "chapter_id":  chapter_id,
         "source_file": filename,
@@ -39,6 +41,7 @@ def _split_large_paragraph(
     para: str,
     size: int,
     overlap: int,
+    resource_id: str,
     course_id: str,
     chapter_id: str,
     filename: str,
@@ -60,7 +63,7 @@ def _split_large_paragraph(
         if chunk_text:
             chunks.append({
                 "text":     chunk_text,
-                "metadata": _make_metadata(course_id, chapter_id, filename, page_num),
+                    "metadata": _make_metadata(resource_id, course_id, chapter_id, filename, page_num),
             })
         # Avance de (size - overlap) pour préserver le contexte de jonction
         step  = size - overlap if overlap < size else size
@@ -71,6 +74,7 @@ def _split_large_paragraph(
 
 def chunk_pages(
     pages: List[Dict[str, Any]],
+    resource_id: str,
     course_id: str,
     chapter_id: str,
     filename: str,
@@ -111,11 +115,11 @@ def chunk_pages(
                 if current_chunk.strip():
                     chunks.append({
                         "text":     current_chunk.strip(),
-                        "metadata": _make_metadata(course_id, chapter_id, filename, page_num),
+                        "metadata": _make_metadata(resource_id, course_id, chapter_id, filename, page_num),
                     })
                     current_chunk = ""
                 chunks.extend(
-                    _split_large_paragraph(para, size, overlap, course_id, chapter_id, filename, page_num)
+                    _split_large_paragraph(para, size, overlap, resource_id, course_id, chapter_id, filename, page_num)
                 )
                 continue
 
@@ -124,7 +128,7 @@ def chunk_pages(
                 if current_chunk.strip():
                     chunks.append({
                         "text":     current_chunk.strip(),
-                        "metadata": _make_metadata(course_id, chapter_id, filename, page_num),
+                        "metadata": _make_metadata(resource_id, course_id, chapter_id, filename, page_num),
                     })
                     # FIX : overlap sécurisé — min() évite de dépasser la longueur réelle
                     tail          = min(overlap, len(current_chunk))
@@ -136,7 +140,7 @@ def chunk_pages(
         if current_chunk.strip():
             chunks.append({
                 "text":     current_chunk.strip(),
-                "metadata": _make_metadata(course_id, chapter_id, filename, page_num),
+                "metadata": _make_metadata(resource_id, course_id, chapter_id, filename, page_num),
             })
 
     return chunks

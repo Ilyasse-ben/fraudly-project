@@ -23,6 +23,7 @@ Pillow
 
 # Data validation
 pydantic
+PyJWT
 
 # Messaging
 kafka-python
