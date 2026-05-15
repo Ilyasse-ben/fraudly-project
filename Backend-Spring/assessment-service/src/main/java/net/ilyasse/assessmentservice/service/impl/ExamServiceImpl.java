@@ -18,6 +18,7 @@ import net.ilyasse.assessmentservice.enums.QuestionType;
 import net.ilyasse.assessmentservice.kafka.CorrectionKafkaProducer;
 import net.ilyasse.assessmentservice.repository.*;
 import net.ilyasse.assessmentservice.service.ExamService;
+import net.ilyasse.assessmentservice.service.ServiceTokenProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,6 +49,7 @@ public class ExamServiceImpl implements ExamService {
     private final CorrectionKafkaProducer correctionKafkaProducer;
     private final ExamAttemptRepository examAttemptRepository;
     private final ExamAnswerRepository examAnswerRepository;
+    private final ServiceTokenProvider serviceTokenProvider;
 
     @Value("${ai.service.url}")
     private String aiServiceUrl;
@@ -121,12 +123,20 @@ public class ExamServiceImpl implements ExamService {
                 .topK(request.getTopK() != null ? request.getTopK() : 8)
                 .build();
 
-            String response = restTemplate.postForObject(url, aiRequest, String.class);
-            return objectMapper.readValue(response, AiGenerationResponse.class);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to call AI service: " + e.getMessage());
+                // Le token ROLE_INTERNAL
+                org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
+                headers.setContentType(org.springframework.http.MediaType.APPLICATION_JSON);
+                headers.set("Authorization", "Bearer " + serviceTokenProvider.generateToken());
+
+                org.springframework.http.HttpEntity<BackendAiGenerationRequest> entity =
+                        new org.springframework.http.HttpEntity<>(aiRequest, headers);
+
+                String response = restTemplate.postForObject(url, entity, String.class);
+                return objectMapper.readValue(response, AiGenerationResponse.class);
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to call AI service: " + e.getMessage());
+            }
         }
-    }
 
     private void saveQuestionsFromAiResponse(Exam exam, AiGenerationResponse aiResponse, QuestionType qcmType) {
         if (aiResponse.getQuestions() == null) return;

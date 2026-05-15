@@ -1,10 +1,10 @@
-package net.fruadly.learningservice.security.jwt;
+package net.ilyasse.assessmentservice.jwt;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,26 +14,24 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
-@RequiredArgsConstructor
+@Slf4j
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtUtils jwtUtils;
+
+    public JwtFilter(JwtUtils jwtUtils) {
+        this.jwtUtils = jwtUtils;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain)
             throws ServletException, IOException {
-
         try {
             String authHeader = request.getHeader("Authorization");
 
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-                filterChain.doFilter(request, response);
-                return;
-            }
-
-            if (SecurityContextHolder.getContext().getAuthentication() != null) {
                 filterChain.doFilter(request, response);
                 return;
             }
@@ -43,7 +41,8 @@ public class JwtFilter extends OncePerRequestFilter {
             if (jwtUtils.isTokenValid(token)) {
                 UUID userId = jwtUtils.extractUserId(token);
                 String role = jwtUtils.extractRole(token);
-                String grantedRole = normalizeRole(role);
+                String grantedRole = role.startsWith("ROLE_") ? role : "ROLE_" + role;
+                log.info("[JWT] userId={} role={} grantedRole={}", userId, role, grantedRole);
 
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
@@ -51,10 +50,9 @@ public class JwtFilter extends OncePerRequestFilter {
                                 null,
                                 List.of(new SimpleGrantedAuthority(grantedRole))
                         );
-
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+                log.info("[JWT] Authentication set: {}", SecurityContextHolder.getContext().getAuthentication());
             }
-
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json");
@@ -63,12 +61,5 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
-    }
-
-    private String normalizeRole(String role) {
-        if (role == null || role.isBlank()) {
-            throw new IllegalArgumentException("Missing role claim");
-        }
-        return role.startsWith("ROLE_") ? role : "ROLE_" + role;
     }
 }
