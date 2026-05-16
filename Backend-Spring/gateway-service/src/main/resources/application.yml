@@ -1,0 +1,59 @@
+spring:
+  application:
+    name: gateway-service
+  cloud:
+    gateway:
+      routes:
+        - id: auth-service
+          uri: lb://authentification-service
+          predicates:
+            - Path=/api/auth/**
+          filters:
+            - StripPrefix=0
+
+        - id: learning-service
+          uri: lb://learning-service
+          predicates:
+            - Path=/api/learning/**,/api/enrolements/**,/api/courses/**,/api/resources/**,/api/tutor/**
+          filters:
+            - StripPrefix=0
+
+        - id: assessment-service
+          uri: lb://assessment-service
+          predicates:
+            - Path=/api/exams/**
+          filters:
+            - StripPrefix=0
+
+        - id: analytics-service
+          uri: lb://analytics-service
+          predicates:
+            - Path=/api/analytics/**
+          filters:
+            - StripPrefix=0
+
+        - id: proctoring-service
+          uri: lb://proctoring-service
+          predicates:
+            - Path=/api/collusion/**,/api/proctoring/**
+          filters:
+            - StripPrefix=0
+
+server:
+  port: 8080
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
+jwt:
+  secret: ${JWT_SECRET:GvTnEQ/hiviPhCkcPdrsoCVWKQyvRLGHGmqvwwDExlQ=}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
