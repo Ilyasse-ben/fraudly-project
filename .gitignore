@@ -1,38 +1,48 @@
-﻿# Python
+﻿# --- Python ---
 venv/
 .venv/
 __pycache__/
 *.pyc
 *.pyo
 
-# Environnement
+# --- Environment Secrets ---
+# Ignore all environment files except the example template
 .env
 .env.*
+!.env.example
 
-# Base de données
+# --- Base de données ---
 *.db
 *.sqlite
 
-# ChromaDB
+# --- ChromaDB ---
 chroma_db/
 chroma_db_diag/
 chroma_db_miniLM384/
 
-# Uploads
+# --- Uploads ---
 uploads/
 
-# Java
+# --- Java / Maven ---
 target/
 *.class
 *.jar
+.mvn/
+*.log
 
-# Node
+# --- Node ---
 node_modules/
 
-# IDE
+# --- OS System Files ---
+.DS_Store
+Thumbs.db
+
+# --- IDE (IntelliJ, VS Code, etc.) ---
 .vscode/
 .idea/
-
-# IDE settings
-.idea/
 *.iml
+*.iws
+*.ipr
+.classpath
+.project
+.settings

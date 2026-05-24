@@ -1,0 +1,125 @@
+services:
+  pgdb:
+    image: postgres:15
+    container_name: pgdb
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: fraudly_auth
+    networks: [fraudly-network]
+    volumes: [postgres-data:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d fraudly_auth"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  kafka:
+    image: confluentinc/cp-kafka:7.6.0
+    container_name: kafka
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      CLUSTER_ID: 5L6g3nShT-eMCtK--X86sw
+      KAFKA_CLUSTER_ID: 5L6g3nShT-eMCtK--X86sw
+    networks: [ fraudly-network ]
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    healthcheck:
+      test: [ "CMD-SHELL", "nc -z localhost 9092 || exit 1" ]
+      interval: 15s
+      start_period: 30s
+      retries: 5
+
+  discovery-service:
+    container_name: discovery-service
+    build: ./Backend-Spring/discovery-service
+    networks: [fraudly-network]
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 8761 || exit 1"]
+      interval: 15s
+      start_period: 40s
+
+  gateway-service:
+    container_name: gateway-service
+    build: ./Backend-Spring/gateway-service
+    ports: ['8080:8080']
+    networks: [fraudly-network]
+    depends_on:
+      discovery-service: {condition: service_healthy}
+
+  authentification-service:
+    container_name: authentification-service
+    build: ./Backend-Spring/authentification-service
+    env_file: [.env]
+    networks: [fraudly-network]
+    depends_on:
+      pgdb: {condition: service_healthy}
+      discovery-service: {condition: service_healthy}
+
+  assessment-service:
+    container_name: assessment-service
+    build: ./Backend-Spring/assessment-service
+    env_file: [.env]
+    networks: [fraudly-network]
+    depends_on:
+      pgdb: {condition: service_healthy}
+      kafka: {condition: service_healthy}
+      discovery-service: {condition: service_healthy}
+
+  learning-service:
+    container_name: learning-service
+    build: ./Backend-Spring/learning-service
+    env_file: [.env]
+    networks: [fraudly-network]
+    depends_on:
+      pgdb: {condition: service_healthy}
+      kafka: {condition: service_healthy}
+      discovery-service: {condition: service_healthy}
+
+  analytics-service:
+    container_name: analytics-service
+    build: ./Backend-Spring/analytics-service
+    env_file: [.env]
+    networks: [fraudly-network]
+    depends_on:
+      pgdb: {condition: service_healthy}
+      kafka: {condition: service_healthy}
+      discovery-service: {condition: service_healthy}
+
+  proctoring-service:
+    container_name: proctoring-service
+    build: ./Backend-Spring/proctoring-service
+    env_file: [.env]
+    networks: [fraudly-network]
+    depends_on:
+      pgdb: {condition: service_healthy}
+      kafka: {condition: service_healthy}
+      discovery-service: {condition: service_healthy}
+
+  backend-ia:
+    container_name: backend-ia
+    build: ./Backend-IA
+    env_file: [.env]
+    networks: [fraudly-network]
+    depends_on:
+      pgdb: {condition: service_healthy}
+      kafka: {condition: service_healthy}
+
+networks:
+  fraudly-network:
+    name: fraudly-project_fraudly-network
+    driver: bridge
+
+volumes:
+  kafka-data: {name: fraudly-project_kafka-data}
+  postgres-data: {name: fraudly-project_postgres-data}
+  redis-data:
+  chroma-data:
