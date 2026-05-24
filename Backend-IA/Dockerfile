@@ -1,8 +1,18 @@
 FROM python:3.11-slim
 
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
+ENV CHROMA_HTTP_HOST=chroma
+ENV CHROMA_HTTP_PORT=8000
+ENV KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+ENV ANALYTICS_SERVICE_BASE_URL=http://analytics-service:8081/api/analytics
+
 WORKDIR /app
 
-# Install system dependencies for OCR and PDF processing
+# Create a non-root user
+RUN useradd -m appuser && chown -R appuser /app
+
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     tesseract-ocr \
     libpoppler-cpp-dev \
@@ -15,12 +25,8 @@ RUN pip install --no-cache-dir -r requirement.txt
 # Copy application code
 COPY . .
 
-# Environment defaults (overridable via docker-compose)
-ENV PYTHONUNBUFFERED=1
-ENV CHROMA_HTTP_HOST=chroma
-ENV CHROMA_HTTP_PORT=8000
-ENV KAFKA_BOOTSTRAP_SERVERS=kafka:9092
-ENV ANALYTICS_SERVICE_BASE_URL=http://analytics-service:8081/api/analytics
+# Switch to non-root user
+USER appuser
 
 EXPOSE 8000
 

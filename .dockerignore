@@ -1,0 +1,17 @@
+# Exclude build artifacts and dependencies
+**/target/
+**/build/
+**/node_modules/
+**/venv/
+**/.venv/
+**/.git/
+**/.idea/
+**/.vscode/
+__pycache__/
+*.pyc
+*.pyo
+
+# Exclude existing jar/docker files
+*.jar
+*.exe
+*.dll
