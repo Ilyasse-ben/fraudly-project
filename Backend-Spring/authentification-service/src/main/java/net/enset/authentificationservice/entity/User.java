@@ -1,21 +1,54 @@
 package net.enset.authentificationservice.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.validation.constraints.Size;
+import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+/**
+ @author ELHAID Yousef
+ **/
 @Entity
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @ToString
+@Table(name = "users")
+@Getter @Setter
+@NoArgsConstructor @AllArgsConstructor
+@Builder
 public class User {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    @Size(min=10)
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @JdbcTypeCode(SqlTypes.UUID)
+    @Column(nullable = false, updatable = false, unique = true)
+    private UUID id;
+
+    @Column(nullable = false, unique = true)
     private String email;
-    @Size(min=8)
+
+    @Column(nullable = false)
     private String password;
+
+    @Column(nullable = false)
+    private String fullName;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Role role;
+
+    @Column(nullable = false)
+    private boolean enabled = true;
+
+    // RGPD fields
+    private LocalDateTime deletedAt;
+    private LocalDateTime consentGivenAt;
+
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
 }

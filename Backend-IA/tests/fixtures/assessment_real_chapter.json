@@ -1,0 +1,8 @@
+{
+  "course_id": "3d8f2d1c-9e1a-4f2d-8a1f-2f3b9a8c4d11",
+  "chapter_id": "6c1d8f24-5e2b-4f9b-9d2a-7f3b1c0a8d55",
+  "source_file": "chapitre_fraude_documentaire.md",
+  "page": 1,
+  "title": "Fraude documentaire et techniques de détection",
+  "content": "La fraude documentaire désigne la falsification ou l'usage frauduleux d'un document officiel pour tromper une institution. Les techniques de détection modernes examinent les métadonnées, les incohérences typographiques, les tampons, les signatures et la structure du fichier. Les analystes combinent souvent l'analyse forensique numérique, la vision par ordinateur et des règles métier pour repérer les anomalies."
+}
