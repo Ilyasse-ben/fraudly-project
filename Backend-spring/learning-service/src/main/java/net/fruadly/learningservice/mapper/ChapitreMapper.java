@@ -4,6 +4,8 @@ import net.fruadly.learningservice.dto.ChapitrDto;
 import net.fruadly.learningservice.entity.Chapter;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+
 @Component
 public class ChapitreMapper {
     // On injecte le ResourceMapper pour transformer les fichiers liés
@@ -11,21 +13,11 @@ public class ChapitreMapper {
 
     public ChapitrDto toDto(Chapter entity) {
         if (entity == null) return null;
-
         ChapitrDto dto = new ChapitrDto();
         dto.setId(entity.getId());
         dto.setTitle(entity.getTitle());
-        dto.setResources(entity.getResources());
+        dto.setResources(entity.getResources() != null ? entity.getResources() : new ArrayList<>());
         dto.setDateChapitre(entity.getDateChapitre());
-
-
-        // Mapping des ressources associées
-//        if (entity.getResources() != null) {
-//            dto.setResources(entity.getResources().stream()
-//                    .map(resourceMapper::toDto)
-//                    .collect(Collectors.toList()));
-//        }
-
         return dto;
     }
 

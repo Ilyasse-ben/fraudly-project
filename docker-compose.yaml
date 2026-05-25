@@ -144,11 +144,13 @@ services:
   backend-ia:
     container_name: backend-ia
     build: ./Backend-IA
-    env_file: [.env]
-    networks: [fraudly-network]
+    env_file: [ .env ]
+    networks: [ fraudly-network ]
     depends_on:
-      pgdb: {condition: service_healthy}
-      kafka: {condition: service_healthy}
+      pgdb: { condition: service_healthy }
+      kafka: { condition: service_healthy }
+    volumes:
+      - chroma-data:/app/chroma_db_native_miniLM384
 
 networks:
   fraudly-network:
@@ -158,5 +160,6 @@ networks:
 volumes:
   kafka-data: {name: fraudly-project_kafka-data}
   postgres-data: {name: fraudly-project_postgres-data}
+
   redis-data:
   chroma-data:

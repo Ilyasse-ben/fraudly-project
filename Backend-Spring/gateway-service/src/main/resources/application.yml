@@ -30,7 +30,7 @@ spring:
         - id: analytics-service
           uri: lb://analytics-service
           predicates:
-            - Path=/api/analytics/**
+            - Path=/api/analytics/**a
           filters:
             - StripPrefix=0
         - id: proctoring-service
