@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.UUID;
 
@@ -20,25 +19,25 @@ public class JwtUtils {
     private String jwtSecret;
 
     private SecretKey getSigningKey() {
-        byte[] keyBytes;
-        try {
-            keyBytes = Base64.getDecoder().decode(jwtSecret);
-        } catch (IllegalArgumentException e) {
-            keyBytes = jwtSecret.getBytes(StandardCharsets.UTF_8);
-        }
+        // Ensure the secret is at least 32 bytes (256 bits) for HMAC-SHA
+        byte[] keyBytes = Base64.getDecoder().decode(jwtSecret);
         return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    // Required for SecurityContextHolder principal
+    public String extractUsername(String token) {
+        return parseClaims(token).getSubject();
     }
 
     public UUID extractUserId(String token) {
         Claims claims = parseClaims(token);
         String userIdValue = claims.get(USER_ID_CLAIM, String.class);
-        if (userIdValue == null) userIdValue = claims.getSubject();
         return UUID.fromString(userIdValue);
     }
 
     public String extractRole(String token) {
         String role = parseClaims(token).get(ROLE_CLAIM, String.class);
-        if (role == null || role.isBlank()) throw new JwtException("Missing role");
+        if (role == null || role.isBlank()) throw new JwtException("Missing role in token");
         return role;
     }
 
