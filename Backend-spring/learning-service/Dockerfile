@@ -12,5 +12,7 @@ RUN addgroup -S spring && adduser -S spring -G spring
 USER spring:spring
 WORKDIR /app
 COPY --from=builder /app/target/*.jar app.jar
-EXPOSE 8084
+
+# Expose 8083 to align with docker-compose SERVER_PORT
+EXPOSE 8083
 ENTRYPOINT ["java", "-jar", "app.jar"]

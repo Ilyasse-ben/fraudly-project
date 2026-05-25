@@ -3,6 +3,11 @@ spring:
     name: gateway-service
   cloud:
     gateway:
+      # THIS IS MANDATORY for dynamic routing
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
       routes:
         - id: auth-service
           uri: lb://authentification-service
@@ -42,18 +47,16 @@ eureka:
   client:
     service-url:
       defaultZone: ${EUREKA_ZONE:http://discovery-service:8761/eureka/}
-    # Gateway MUST fetch the registry to use 'lb://'
     fetch-registry: true
     register-with-eureka: true
-    registry-fetch-interval-seconds: 5
   instance:
     prefer-ip-address: true
-
-jwt:
-  secret: ${JWT_SECRET}
 
 management:
   endpoints:
     web:
       exposure:
-        include: "*"
+        include: "health,info,mappings,env,gateway"
+  endpoint:
+    gateway:
+      enabled: true
