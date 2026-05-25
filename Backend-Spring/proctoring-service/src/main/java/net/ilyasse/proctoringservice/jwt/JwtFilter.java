@@ -11,7 +11,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.UUID;
 
 public class JwtFilter extends OncePerRequestFilter {
 
@@ -26,26 +25,34 @@ public class JwtFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain)
             throws ServletException, IOException {
+
         try {
             String authHeader = request.getHeader("Authorization");
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
                 filterChain.doFilter(request, response);
                 return;
             }
+
             String token = authHeader.substring(7);
             if (jwtUtils.isTokenValid(token)) {
-                UUID userId = jwtUtils.extractUserId(token);
+                // Use the subject (username/email) as the principal
+                String username = jwtUtils.extractUsername(token);
                 String role = jwtUtils.extractRole(token);
+
+                // Ensure the role prefix is added correctly
                 String grantedRole = role.startsWith("ROLE_") ? role : "ROLE_" + role;
 
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
-                                userId, null,
+                                username,
+                                null,
                                 List.of(new SimpleGrantedAuthority(grantedRole))
                         );
+
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (Exception e) {
+            logger.error("Authentication failed: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json");
             response.getWriter().write("{\"error\":\"Invalid JWT token\"}");

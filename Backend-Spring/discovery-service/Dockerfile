@@ -2,7 +2,6 @@
 FROM maven:3.9.6-eclipse-temurin-17 AS builder
 WORKDIR /app
 COPY pom.xml .
-# Cache dependencies (Crucial for disk space management!)
 RUN mvn dependency:go-offline -B
 COPY src ./src
 RUN mvn clean package -DskipTests
@@ -13,6 +12,10 @@ RUN addgroup -S spring && adduser -S spring -G spring
 USER spring:spring
 WORKDIR /app
 COPY --from=builder /app/target/*.jar app.jar
-# Discovery uses 8761, Gateway uses 8080
-EXPOSE 8761 8080
+
+# Explicitly expose only 8761 for the discovery-service
+EXPOSE 8761
+
+# Using an array for the entrypoint ensures signal handling (SIGTERM)
+# works correctly for graceful shutdowns
 ENTRYPOINT ["java", "-jar", "app.jar"]
