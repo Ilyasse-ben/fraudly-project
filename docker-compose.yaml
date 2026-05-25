@@ -82,11 +82,13 @@ services:
     build: ./Backend-Spring/authentification-service
     environment:
       - SERVER_PORT=${SERVER_PORT_AUTH}
+      - EUREKA_ZONE=http://discovery-service:8761/eureka/
     env_file: [.env]
     networks: [fraudly-network]
     depends_on:
       pgdb: {condition: service_healthy}
       discovery-service: {condition: service_healthy}
+
 
   assessment-service:
     container_name: assessment-service
