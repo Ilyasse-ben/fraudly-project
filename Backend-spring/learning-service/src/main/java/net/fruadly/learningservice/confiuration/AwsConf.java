@@ -14,29 +14,32 @@ import java.net.URI;
 
 @Configuration
 public class AwsConf {
-    @Value("${aws.accessKey}") 
+    @Value("${AWS_ENDPOINT_URL:http://minio:9000}")
+    private String endpointUrl;
+
+    @Value("${AWS_ACCESS_KEY}")
     private String accessKey;
 
-    @Value("${aws.secretKey}")
+    @Value("${AWS_SECRET_KEY}")
     private String secretKey;
-    @Value("${aws.sessionToken}")
+
+    @Value("${AWS_SESSION_TOKEN}")
     private String sessionToken;
 
-    @Value("${aws.region}")
+    @Value("${AWS_REGION:us-east-1}")
     private String region;
 
     @Bean
     public S3Client s3Client() {
         return S3Client.builder()
+                .endpointOverride(URI.create(endpointUrl))
                 .region(Region.of(region))
-                .credentialsProvider(
-                        StaticCredentialsProvider.create(
-                                AwsSessionCredentials.create(accessKey, secretKey, sessionToken)
-                        )
-                )
-                // Optionnel : force l'accélération ou le style d'URL si nécessaire
+                .credentialsProvider(StaticCredentialsProvider.create(
+                        // USE BasicCredentials instead of SessionCredentials
+                        AwsBasicCredentials.create(accessKey, secretKey)
+                ))
                 .serviceConfiguration(S3Configuration.builder()
-                        .pathStyleAccessEnabled(true) // Essaie de passer à true si l'erreur persiste
+                        .pathStyleAccessEnabled(true)
                         .build())
                 .build();
     }
