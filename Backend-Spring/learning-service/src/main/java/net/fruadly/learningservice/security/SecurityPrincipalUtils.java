@@ -16,18 +16,19 @@ public class SecurityPrincipalUtils {
         }
 
         Object principal = authentication.getPrincipal();
-        if (principal instanceof UUID userId) {
-            return userId;
+        String userIdString;
+
+        if (principal instanceof String) {
+            userIdString = (String) principal;
+        } else {
+            // Fallback if it somehow still comes in as something else
+            userIdString = principal.toString();
         }
 
-        if (principal instanceof String value && !value.isBlank()) {
-            try {
-                return UUID.fromString(value);
-            } catch (IllegalArgumentException ex) {
-                throw new IllegalStateException("Principal is not a valid UUID", ex);
-            }
+        try {
+            return UUID.fromString(userIdString);
+        } catch (IllegalArgumentException ex) {
+            throw new IllegalStateException("Principal is not a valid UUID: " + userIdString, ex);
         }
-
-        throw new IllegalStateException("Unsupported principal type: " + principal.getClass().getName());
     }
 }

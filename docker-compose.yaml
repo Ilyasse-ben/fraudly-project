@@ -105,14 +105,16 @@ services:
   learning-service:
     container_name: learning-service
     build: ./Backend-Spring/learning-service
+    ports:
+      - "${SERVER_PORT_LEARNING}:${SERVER_PORT_LEARNING}"
     environment:
       - SERVER_PORT=${SERVER_PORT_LEARNING}
-    env_file: [.env]
-    networks: [fraudly-network]
+    env_file: [ .env ]
+    networks: [ fraudly-network ]
     depends_on:
-      pgdb: {condition: service_healthy}
-      kafka: {condition: service_healthy}
-      discovery-service: {condition: service_healthy}
+      pgdb: { condition: service_healthy }
+      kafka: { condition: service_healthy }
+      discovery-service: { condition: service_healthy }
 
   analytics-service:
     container_name: analytics-service

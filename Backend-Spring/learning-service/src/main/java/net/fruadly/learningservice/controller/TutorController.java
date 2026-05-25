@@ -7,7 +7,7 @@ import net.fruadly.learningservice.service.TutorService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/tutor")
+@RequestMapping("/api/learning/tutor")
 @RequiredArgsConstructor
 public class TutorController {
 
