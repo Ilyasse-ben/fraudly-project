@@ -8,6 +8,7 @@ import { Chapiter } from './chapiter/chapiter';
 import { DashbordProf } from './dashbord-prof/dashbord-prof';
 import { Assistant } from './assistant/assistant';
 import { ListExemane } from './list-exemane/list-exemane';
+import { Login } from './login/login';
 
 export const routes: Routes = [
     {path:"cours",component:Cours},
@@ -19,6 +20,7 @@ export const routes: Routes = [
     { path: "dashbord", component: DashbordProf },
     { path: "assistant", component: Assistant },
     { path: "exemen", component: Examen },
+    {path:"login", component:Login}
 
 
     

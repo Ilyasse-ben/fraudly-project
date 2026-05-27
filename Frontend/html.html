@@ -6,9 +6,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Exams - Fraudly</title>
+    <title>Fraudly - Sign Up</title>
 
-    <!-- Tailwind -->
+    <!-- Tailwind CSS -->
 
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -26,289 +26,199 @@
 
 </head>
 
-<body class="bg-slate-50 text-slate-900">
+<body class="bg-slate-100 min-h-screen flex items-center justify-center p-6">
 
-    <div class="flex min-h-screen">
+    <!-- MAIN CARD -->
 
-        <!-- SIDEBAR -->
+    <div class="w-full max-w-5xl bg-white rounded-[35px] overflow-hidden shadow-xl grid grid-cols-2">
 
-        <aside class="w-72 bg-white border-r border-slate-200 p-8 fixed left-0 top-0 h-screen">
+        <!-- LEFT SIDE -->
 
-            <h1 class="text-3xl font-bold mb-10">
+        <div class="bg-blue-600 p-14 text-white flex flex-col justify-center">
+
+            <h1 class="text-5xl font-bold mb-6">
                 Fraudly
             </h1>
 
-            <nav class="space-y-2">
+            <p class="text-blue-100 text-lg leading-8 mb-10">
+                Join the next generation educational platform powered by AI.
+            </p>
 
-                <a href="#" class="block px-4 py-3 rounded-xl text-slate-600 hover:bg-slate-100 transition">
-                    Dashboard
-                </a>
+            <!-- FEATURES -->
 
-                <a href="#" class="block px-4 py-3 rounded-xl text-slate-600 hover:bg-slate-100 transition">
-                    Courses
-                </a>
+            <div class="space-y-5">
 
-                <a href="#" class="block px-4 py-3 rounded-xl bg-blue-50 text-blue-600 font-semibold">
-                    Exams
-                </a>
+                <div class="flex items-center gap-4">
 
-                <a href="#" class="block px-4 py-3 rounded-xl text-slate-600 hover:bg-slate-100 transition">
-                    AI Assistant
-                </a>
+                    <div class="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center">
+                        🎓
+                    </div>
 
-            </nav>
+                    <span class="text-lg">
+                        Smart Learning Experience
+                    </span>
 
-        </aside>
+                </div>
 
-        <!-- MAIN -->
+                <div class="flex items-center gap-4">
 
-        <main class="ml-72 flex-1 p-12">
+                    <div class="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center">
+                        🤖
+                    </div>
+
+                    <span class="text-lg">
+                        AI Educational Assistant
+                    </span>
+
+                </div>
+
+                <div class="flex items-center gap-4">
+
+                    <div class="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center">
+                        🔒
+                    </div>
+
+                    <span class="text-lg">
+                        Secure Online Examinations
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- RIGHT SIDE -->
+
+        <div class="p-14 flex flex-col justify-center">
 
             <!-- HEADER -->
 
-            <div class="flex items-center justify-between mb-10">
+            <div class="mb-10">
+
+                <h2 class="text-4xl font-bold mb-3">
+                    Create Account
+                </h2>
+
+                <p class="text-slate-500 text-lg">
+                    Start your intelligent learning journey
+                </p>
+
+            </div>
+
+            <!-- FORM -->
+
+            <form class="space-y-6">
+
+                <!-- FULL NAME -->
 
                 <div>
 
-                    <h1 class="text-5xl font-bold mb-3">
-                        Exams
-                    </h1>
+                    <label class="block text-sm font-semibold mb-3">
+                        Full Name
+                    </label>
 
-                    <p class="text-slate-500 text-lg">
-                        Access and complete your online evaluations
-                    </p>
-
-                </div>
-
-                <!-- STATS -->
-
-                <div class="bg-white border border-slate-200 rounded-2xl px-6 py-4 shadow-sm">
-
-                    <p class="text-sm text-slate-500 mb-1">
-                        Pending Exams
-                    </p>
-
-                    <h2 class="text-3xl font-bold text-blue-600">
-                        4
-                    </h2>
+                    <input type="text" placeholder="Enter your full name"
+                        class="w-full px-5 py-4 rounded-2xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition" />
 
                 </div>
 
-            </div>
+                <!-- EMAIL -->
 
-            <!-- EXAMS GRID -->
+                <div>
 
-            <div class="grid grid-cols-2 gap-8">
+                    <label class="block text-sm font-semibold mb-3">
+                        Email Address
+                    </label>
 
-                <!-- EXAM CARD -->
+                    <input type="email" placeholder="Enter your email"
+                        class="w-full px-5 py-4 rounded-2xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition" />
 
-                <a href="exam-page.html"
-                    class="bg-white border border-slate-200 rounded-3xl p-8 shadow-sm hover:shadow-lg hover:-translate-y-1 transition duration-300 block">
+                </div>
 
-                    <!-- TOP -->
+                <!-- ROLE -->
 
-                    <div class="flex items-center justify-between mb-6">
+                <div>
 
-                        <span class="px-4 py-2 rounded-full bg-blue-50 text-blue-600 text-sm font-semibold">
-                            Machine Learning
-                        </span>
+                    <label class="block text-sm font-semibold mb-3">
+                        Account Type
+                    </label>
 
-                        <span class="text-sm text-slate-500">
-                            60 min
-                        </span>
+                    <select
+                        class="w-full px-5 py-4 rounded-2xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition">
 
-                    </div>
+                        <option>Student</option>
 
-                    <!-- TITLE -->
+                        <option>Professor</option>
 
-                    <h2 class="text-3xl font-bold mb-4">
-                        Midterm Examination
-                    </h2>
+                        <option>Administrator</option>
 
-                    <!-- DESCRIPTION -->
+                    </select>
 
-                    <p class="text-slate-500 leading-8 mb-6">
-                        Covers supervised learning, regression and neural network fundamentals.
-                    </p>
+                </div>
 
-                    <!-- INFO -->
+                <!-- PASSWORD -->
 
-                    <div class="flex items-center justify-between">
+                <div>
 
-                        <div>
+                    <label class="block text-sm font-semibold mb-3">
+                        Password
+                    </label>
 
-                            <p class="text-sm text-slate-500 mb-1">
-                                Deadline
-                            </p>
+                    <input type="password" placeholder="Create your password"
+                        class="w-full px-5 py-4 rounded-2xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition" />
 
-                            <p class="font-semibold">
-                                May 18, 2026
-                            </p>
+                </div>
 
-                        </div>
+                <!-- CONFIRM PASSWORD -->
 
-                        <!-- BUTTON -->
+                <div>
 
-                        <div class="px-5 py-3 rounded-2xl bg-blue-600 text-white font-semibold">
+                    <label class="block text-sm font-semibold mb-3">
+                        Confirm Password
+                    </label>
 
-                            Start Exam
+                    <input type="password" placeholder="Confirm your password"
+                        class="w-full px-5 py-4 rounded-2xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition" />
 
-                        </div>
+                </div>
 
-                    </div>
+                <!-- TERMS -->
 
-                </a>
+                <label class="flex items-center gap-3 text-sm text-slate-500">
 
-                <!-- EXAM CARD -->
+                    <input type="checkbox">
 
-                <a href="exam-page.html"
-                    class="bg-white border border-slate-200 rounded-3xl p-8 shadow-sm hover:shadow-lg hover:-translate-y-1 transition duration-300 block">
+                    I agree to the Terms and Conditions
 
-                    <div class="flex items-center justify-between mb-6">
+                </label>
 
-                        <span class="px-4 py-2 rounded-full bg-green-50 text-green-600 text-sm font-semibold">
-                            Cloud Computing
-                        </span>
+                <!-- BUTTON -->
 
-                        <span class="text-sm text-slate-500">
-                            90 min
-                        </span>
+                <button type="submit"
+                    class="w-full py-5 rounded-2xl bg-blue-600 hover:bg-blue-700 transition duration-300 text-white font-semibold text-lg shadow-lg shadow-blue-100">
 
-                    </div>
+                    Create Account
 
-                    <h2 class="text-3xl font-bold mb-4">
-                        AWS Fundamentals
-                    </h2>
+                </button>
 
-                    <p class="text-slate-500 leading-8 mb-6">
-                        Evaluation about Docker, Kubernetes and AWS architecture.
-                    </p>
+                <!-- FOOTER -->
 
-                    <div class="flex items-center justify-between">
+                <p class="text-center text-slate-500 pt-4">
 
-                        <div>
+                    Already have an account?
 
-                            <p class="text-sm text-slate-500 mb-1">
-                                Deadline
-                            </p>
+                    <a href="#" class="text-blue-600 font-semibold hover:text-blue-700 transition">
 
-                            <p class="font-semibold">
-                                May 22, 2026
-                            </p>
+                        Sign In
 
-                        </div>
+                    </a>
 
-                        <div class="px-5 py-3 rounded-2xl bg-blue-600 text-white font-semibold">
+                </p>
 
-                            Start Exam
+            </form>
 
-                        </div>
-
-                    </div>
-
-                </a>
-
-                <!-- EXAM CARD -->
-
-                <a href="exam-page.html"
-                    class="bg-white border border-slate-200 rounded-3xl p-8 shadow-sm hover:shadow-lg hover:-translate-y-1 transition duration-300 block">
-
-                    <div class="flex items-center justify-between mb-6">
-
-                        <span class="px-4 py-2 rounded-full bg-purple-50 text-purple-600 text-sm font-semibold">
-                            Cyber Security
-                        </span>
-
-                        <span class="text-sm text-slate-500">
-                            45 min
-                        </span>
-
-                    </div>
-
-                    <h2 class="text-3xl font-bold mb-4">
-                        Security Assessment
-                    </h2>
-
-                    <p class="text-slate-500 leading-8 mb-6">
-                        Questions about authentication, encryption and network security.
-                    </p>
-
-                    <div class="flex items-center justify-between">
-
-                        <div>
-
-                            <p class="text-sm text-slate-500 mb-1">
-                                Deadline
-                            </p>
-
-                            <p class="font-semibold">
-                                May 25, 2026
-                            </p>
-
-                        </div>
-
-                        <div class="px-5 py-3 rounded-2xl bg-blue-600 text-white font-semibold">
-
-                            Start Exam
-
-                        </div>
-
-                    </div>
-
-                </a>
-
-                <!-- EXAM CARD -->
-
-                <a href="exam-page.html"
-                    class="bg-white border border-slate-200 rounded-3xl p-8 shadow-sm hover:shadow-lg hover:-translate-y-1 transition duration-300 block">
-
-                    <div class="flex items-center justify-between mb-6">
-
-                        <span class="px-4 py-2 rounded-full bg-orange-50 text-orange-600 text-sm font-semibold">
-                            Data Science
-                        </span>
-
-                        <span class="text-sm text-slate-500">
-                            75 min
-                        </span>
-
-                    </div>
-
-                    <h2 class="text-3xl font-bold mb-4">
-                        Python & Pandas
-                    </h2>
-
-                    <p class="text-slate-500 leading-8 mb-6">
-                        Practical questions about data manipulation and visualization.
-                    </p>
-
-                    <div class="flex items-center justify-between">
-
-                        <div>
-
-                            <p class="text-sm text-slate-500 mb-1">
-                                Deadline
-                            </p>
-
-                            <p class="font-semibold">
-                                May 29, 2026
-                            </p>
-
-                        </div>
-
-                        <div class="px-5 py-3 rounded-2xl bg-blue-600 text-white font-semibold">
-
-                            Start Exam
-
-                        </div>
-
-                    </div>
-
-                </a>
-
-            </div>
-
-        </main>
+        </div>
 
     </div>
 
