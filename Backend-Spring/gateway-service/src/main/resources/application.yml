@@ -3,6 +3,11 @@ spring:
     name: gateway-service
   cloud:
     gateway:
+      # THIS IS MANDATORY for dynamic routing
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
       routes:
         - id: auth-service
           uri: lb://authentification-service
@@ -10,28 +15,24 @@ spring:
             - Path=/api/auth/**
           filters:
             - StripPrefix=0
-
         - id: learning-service
           uri: lb://learning-service
           predicates:
             - Path=/api/learning/**,/api/enrolements/**,/api/courses/**,/api/resources/**,/api/tutor/**
           filters:
             - StripPrefix=0
-
         - id: assessment-service
           uri: lb://assessment-service
           predicates:
             - Path=/api/exams/**
           filters:
             - StripPrefix=0
-
         - id: analytics-service
           uri: lb://analytics-service
           predicates:
-            - Path=/api/analytics/**
+            - Path=/api/analytics/**a
           filters:
             - StripPrefix=0
-
         - id: proctoring-service
           uri: lb://proctoring-service
           predicates:
@@ -45,15 +46,17 @@ server:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: ${EUREKA_ZONE:http://discovery-service:8761/eureka/}
+    fetch-registry: true
+    register-with-eureka: true
   instance:
     prefer-ip-address: true
-
-jwt:
-  secret: ${JWT_SECRET:GvTnEQ/hiviPhCkcPdrsoCVWKQyvRLGHGmqvwwDExlQ=}
 
 management:
   endpoints:
     web:
       exposure:
-        include: "*"
+        include: "health,info,mappings,env,gateway"
+  endpoint:
+    gateway:
+      enabled: true

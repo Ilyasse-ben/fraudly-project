@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/chapitres")
+@RequestMapping("/api/learning/chapitres")
 @RequiredArgsConstructor
 public class ChapitreController {
     private final ChapitreService chapterService;
@@ -19,7 +19,8 @@ public class ChapitreController {
     @PostMapping("/{courseId}")
     @PreAuthorize("hasAnyAuthority('ROLE_TEACHER', 'ROLE_ADMIN')")
     public ResponseEntity<ChapitrDto> create(@PathVariable UUID courseId, @RequestBody ChapitrDto dto) {
-        return new ResponseEntity<>(chapterService.addChapterToCourse(courseId, dto), HttpStatus.CREATED);
+        ChapitrDto created = chapterService.addChapterToCourse(courseId, dto);
+        return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_TEACHER', 'ROLE_ADMIN')")

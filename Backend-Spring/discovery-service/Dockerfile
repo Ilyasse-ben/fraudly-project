@@ -13,6 +13,9 @@ USER spring:spring
 WORKDIR /app
 COPY --from=builder /app/target/*.jar app.jar
 
-# Expose port 8084 to align with Docker Compose
-EXPOSE 8084
+# Explicitly expose only 8761 for the discovery-service
+EXPOSE 8761
+
+# Using an array for the entrypoint ensures signal handling (SIGTERM)
+# works correctly for graceful shutdowns
 ENTRYPOINT ["java", "-jar", "app.jar"]

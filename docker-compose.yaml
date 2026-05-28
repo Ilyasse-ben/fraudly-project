@@ -1,0 +1,165 @@
+services:
+  # --- Infrastructure ---
+  pgdb:
+    image: postgres:15
+    container_name: pgdb
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: fraudly_auth
+    networks: [fraudly-network]
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d fraudly_auth"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  kafka:
+    image: confluentinc/cp-kafka:7.6.0
+    container_name: kafka
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      CLUSTER_ID: 5L6g3nShT-eMCtK--X86sw
+      KAFKA_CLUSTER_ID: 5L6g3nShT-eMCtK--X86sw
+    networks: [fraudly-network]
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 9092 || exit 1"]
+      interval: 15s
+      start_period: 30s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    networks: [ fraudly-network ]
+    ports: [ "6379:6379" ]
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # --- Microservices ---
+  discovery-service:
+    container_name: discovery-service
+    build: ./Backend-Spring/discovery-service
+    ports:
+      - "8761:8761"  # <--- ADDED THIS LINE
+    environment:
+      - SERVER_PORT=8761
+    networks: [fraudly-network]
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 8761 || exit 1"]
+      interval: 15s
+      start_period: 40s
+
+  gateway-service:
+    container_name: gateway-service
+    build: ./Backend-Spring/gateway-service
+    ports: ["8080:8080"]
+    environment:
+      - SERVER_PORT=${SERVER_PORT}
+      - JWT_SECRET=${JWT_SECRET}
+      - EUREKA_ZONE=${EUREKA_ZONE}
+    networks: [fraudly-network]
+    depends_on:
+      discovery-service: {condition: service_healthy}
+
+  authentification-service:
+    container_name: authentification-service
+    build: ./Backend-Spring/authentification-service
+    environment:
+      - SERVER_PORT=${SERVER_PORT_AUTH}
+      - EUREKA_ZONE=http://discovery-service:8761/eureka/
+    env_file: [.env]
+    networks: [fraudly-network]
+    depends_on:
+      pgdb: {condition: service_healthy}
+      discovery-service: {condition: service_healthy}
+
+
+  assessment-service:
+    container_name: assessment-service
+    build: ./Backend-Spring/assessment-service
+    environment:
+      - SERVER_PORT=${SERVER_PORT_ASSESSMENT}
+    env_file: [.env]
+    networks: [fraudly-network]
+    depends_on:
+      pgdb: {condition: service_healthy}
+      kafka: {condition: service_healthy}
+      discovery-service: {condition: service_healthy}
+
+  learning-service:
+    container_name: learning-service
+    build: ./Backend-Spring/learning-service
+    ports:
+      - "${SERVER_PORT_LEARNING}:${SERVER_PORT_LEARNING}"
+    environment:
+      - SERVER_PORT=${SERVER_PORT_LEARNING}
+    env_file: [ .env ]
+    networks: [ fraudly-network ]
+    depends_on:
+      pgdb: { condition: service_healthy }
+      kafka: { condition: service_healthy }
+      discovery-service: { condition: service_healthy }
+
+  analytics-service:
+    container_name: analytics-service
+    build: ./Backend-Spring/analytics-service
+    environment:
+      - SERVER_PORT=${SERVER_PORT_ANALYTICS}
+    env_file: [.env]
+    networks: [fraudly-network]
+    depends_on:
+      pgdb: {condition: service_healthy}
+      kafka: {condition: service_healthy}
+      discovery-service: {condition: service_healthy}
+
+  proctoring-service:
+    container_name: proctoring-service
+    build: ./Backend-Spring/proctoring-service
+    environment:
+      - SERVER_PORT=${SERVER_PORT_PROCTORING}
+    env_file: [.env]
+    networks: [fraudly-network]
+    depends_on:
+      pgdb: {condition: service_healthy}
+      kafka: {condition: service_healthy}
+      discovery-service: {condition: service_healthy}
+      redis: {condition: service_healthy}
+
+  backend-ia:
+    container_name: backend-ia
+    build: ./Backend-IA
+    env_file: [ .env ]
+    networks: [ fraudly-network ]
+    depends_on:
+      pgdb: { condition: service_healthy }
+      kafka: { condition: service_healthy }
+    volumes:
+      - chroma-data:/app/chroma_db_native_miniLM384
+
+networks:
+  fraudly-network:
+    name: fraudly-project_fraudly-network
+    driver: bridge
+
+volumes:
+  kafka-data: {name: fraudly-project_kafka-data}
+  postgres-data: {name: fraudly-project_postgres-data}
+
+  redis-data:
+  chroma-data:

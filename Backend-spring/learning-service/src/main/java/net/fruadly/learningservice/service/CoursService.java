@@ -1,7 +1,5 @@
 package net.fruadly.learningservice.service;
 
-
-
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import net.fruadly.learningservice.dto.CoursGetDto;
@@ -9,7 +7,7 @@ import net.fruadly.learningservice.dto.CoursPostDto;
 import net.fruadly.learningservice.entity.Cours;
 import net.fruadly.learningservice.mapper.CourseMapper;
 import net.fruadly.learningservice.repository.CoursRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import net.fruadly.learningservice.security.SecurityPrincipalUtils;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
@@ -24,28 +22,32 @@ public class CoursService {
 
     private final CoursRepository courseRepository;
     private final CourseMapper courseMapper;
-    public  String generate(int length) {
+    private final SecurityPrincipalUtils securityPrincipalUtils;
+
+    private String generate(int length) {
         final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         final SecureRandom RANDOM = new SecureRandom();
         String token;
         do {
             StringBuilder sb = new StringBuilder(length);
             for (int i = 0; i < length; i++) {
-                int index = RANDOM.nextInt(CHARACTERS.length());
-                sb.append(CHARACTERS.charAt(index));
+                sb.append(CHARACTERS.charAt(RANDOM.nextInt(CHARACTERS.length())));
             }
             token = sb.toString();
         } while (courseRepository.existsByCoursCode(token));
-
         return token;
     }
 
     public CoursPostDto createCourse(CoursPostDto coursPostDto) {
-        Cours cours = courseMapper.toEntity(coursPostDto);
-        String token=generate(8);
-        cours.setCoursCode(token);
-        // Logique spécifique : un nouveau cours commence toujours à la version 1
+        Cours cours = new Cours();
+        cours.setTitle(coursPostDto.getTitle());
+        cours.setDescription(coursPostDto.getDescription());
+        cours.setCategory(coursPostDto.getCategory());
+        cours.setCoursCode(generate(8));
+        cours.setProfId(securityPrincipalUtils.requireUserId());
+
         Cours savedCourse = courseRepository.save(cours);
+
         return courseMapper.toPostDto(savedCourse);
     }
 
@@ -54,30 +56,23 @@ public class CoursService {
                 .map(courseMapper::toGetDto)
                 .collect(Collectors.toList());
     }
+
     public CoursGetDto getCourseById(UUID id) {
-        Cours cours = courseRepository.findById(id)
+        return courseRepository.findById(id)
+                .map(courseMapper::toGetDto)
                 .orElseThrow(() -> new RuntimeException("Cours non trouvé avec l'id : " + id));
-        return courseMapper.toGetDto(cours);
     }
 
-
-
-    public CoursPostDto updateCourse(UUID id, CoursPostDto coursGetDto) {
-        // On vérifie d'abord si le cours existe
+    public CoursPostDto updateCourse(UUID id, CoursPostDto dto) {
         Cours existingCourse = courseRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Impossible de mettre à jour : Cours non trouvé"));
 
-        // Mise à jour des champs
-        existingCourse.setTitle(coursGetDto.getTitle());
-        existingCourse.setDescription(coursGetDto.getDescription());
-        existingCourse.setCategory(coursGetDto.getCategory());
+        existingCourse.setTitle(dto.getTitle());
+        existingCourse.setDescription(dto.getDescription());
+        existingCourse.setCategory(dto.getCategory());
 
-        // Note : On ne change généralement pas l'instructorId ou l'ID lors d'un update
-
-        Cours updatedCourse = courseRepository.save(existingCourse);
-        return courseMapper.toPostDto(updatedCourse);
+        return courseMapper.toPostDto(courseRepository.save(existingCourse));
     }
-
 
     public void deleteCourse(UUID id) {
         if (!courseRepository.existsById(id)) {
@@ -85,5 +80,4 @@ public class CoursService {
         }
         courseRepository.deleteById(id);
     }
-
 }

@@ -1,15 +1,18 @@
-# builde l'application
+# Stage 1: Build
 FROM maven:3.9.6-eclipse-temurin-21 AS builder
 WORKDIR /app
-COPY pom.xml /app/
-COPY src /app/src
+COPY pom.xml .
+RUN mvn dependency:go-offline -B
+COPY src ./src
+RUN mvn clean package -DskipTests
 
-RUN mvn -f /app/pom.xml clean package -DskipTests
+# Stage 2: Run
+FROM eclipse-temurin:21-jre-alpine
+RUN addgroup -S spring && adduser -S spring -G spring
+USER spring:spring
+WORKDIR /app
+COPY --from=builder /app/target/*.jar app.jar
 
-
-# image de l'application
-FROM eclipse-temurin:21-jdk
-VOLUME /tmp
-COPY --from=builder /app/target/*.jar  /app/app.jar
-EXPOSE 8084
-ENTRYPOINT ["java","-jar", "/app/app.jar"]
+# Expose 8083 to align with docker-compose SERVER_PORT
+EXPOSE 8083
+ENTRYPOINT ["java", "-jar", "app.jar"]
