@@ -46,3 +46,16 @@ Thumbs.db
 .classpath
 .project
 .settings
+
+# --- Build Outputs ---
+# Angular build folder
+/Frontend/dist/
+/Frontend/.angular/
+
+# Maven/Gradle sub-project targets
+**/target/
+**/build/
+**/out/
+
+# Spring logs
+**/logs/
