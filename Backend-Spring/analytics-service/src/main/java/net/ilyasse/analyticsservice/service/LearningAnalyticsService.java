@@ -1,5 +1,7 @@
 package net.ilyasse.analyticsservice.service;
 
+import net.ilyasse.analyticsservice.dto.StudentGradeDto;
+
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -14,4 +16,6 @@ public interface LearningAnalyticsService {
     List<String> getWeakTopics(UUID studentId, UUID courseId, int minCount);
     List<Map<String, Object>> getCourseTopicStats(UUID courseId);
     Map<String, Object> getStudentProfile(UUID studentId, UUID courseId);
+    // In LearningAnalyticsService.java
+    List<StudentGradeDto> getStudentsGrades(UUID courseId);
 }

@@ -1,161 +1,202 @@
-<main class="flex-1 p-12">
+<div class="flex flex-col min-h-screen bg-slate-50">
 
-    <!-- HEADER -->
+  <!-- Loading State -->
+  @if (loading) {
+    <div class="flex-1 flex items-center justify-center">
+      <div class="text-center">
+        <div class="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+        <p class="text-slate-500 text-lg">Loading exam...</p>
+      </div>
+    </div>
+  }
 
-    <div class="flex items-center justify-between mb-10">
-
-        <div>
-
-            <h1 class="text-5xl font-bold mb-3">
-                Machine Learning Exam
-            </h1>
-
-            <p class="text-slate-500 text-lg">
-                Answer all questions before submitting your exam
-            </p>
-
-        </div>
-
-        <button class="px-6 py-4 rounded-2xl bg-red-500 hover:bg-red-600 transition text-white font-semibold">
-
-            Submit Exam
-
+  <!-- Error State -->
+  @if (!loading && error && !submitted) {
+    <div class="flex-1 flex items-center justify-center p-8">
+      <div class="bg-red-50 border border-red-200 rounded-3xl p-10 text-center max-w-md">
+        <p class="text-red-600 font-semibold text-lg mb-6">{{ error }}</p>
+        <button (click)="goBack()"
+                class="px-6 py-3 rounded-2xl bg-slate-900 text-white font-semibold hover:bg-slate-700 transition">
+          Back to Exams
         </button>
-
+      </div>
     </div>
+  }
 
-    <!-- QUESTION CARD -->
+  <!-- Submitted State -->
+  @if (submitted) {
+    <div class="flex-1 flex items-center justify-center p-8">
+      <div class="bg-white border border-slate-200 rounded-3xl p-12 text-center max-w-md shadow-sm">
+        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          </svg>
+        </div>
+        <h2 class="text-3xl font-bold mb-3">Exam Submitted</h2>
+        <p class="text-slate-500 mb-8">Your answers have been recorded. Results will be available after grading.</p>
+        <button (click)="goBack()"
+                class="px-6 py-3 rounded-2xl bg-blue-600 text-white font-semibold hover:bg-blue-700 transition">
+          Back to Exams
+        </button>
+      </div>
+    </div>
+  }
 
-    <div class="bg-white border border-slate-200 rounded-3xl p-10 shadow-sm">
+  <!-- Active Exam -->
+  @if (!loading && !submitted && exam) {
 
-        <!-- QUESTION NUMBER -->
+    <!-- Sticky Header -->
+    <header class="sticky top-0 z-20 bg-white border-b border-slate-200 shadow-sm px-8 py-4">
+      <div class="max-w-4xl mx-auto flex items-center justify-between gap-6">
 
-        <div class="flex items-center justify-between mb-6">
-
-            <span class="px-4 py-2 rounded-full bg-blue-50 text-blue-600 font-medium">
-                Question 1 / 10
-            </span>
-
-            <span class="text-slate-500">
-                5 Points
-            </span>
-
+        <div class="min-w-0">
+          <h1 class="text-2xl font-bold truncate">{{ exam.title }}</h1>
+          <p class="text-sm text-slate-500">{{ exam.topic }} &nbsp;·&nbsp; {{ questions.length }} question(s)</p>
         </div>
 
-        <!-- QUESTION -->
+        <div class="flex items-center gap-4 shrink-0">
 
-        <h2 class="text-3xl font-bold leading-relaxed mb-8">
+          <!-- Countdown Timer -->
+          <div class="flex items-center gap-2 px-5 py-2 rounded-2xl border font-mono text-xl font-bold transition-colors"
+               [class.border-slate-200]="!timerIsWarning"
+               [class.bg-slate-50]="!timerIsWarning"
+               [class.text-slate-800]="!timerIsWarning"
+               [class.border-red-300]="timerIsWarning"
+               [class.bg-red-50]="timerIsWarning"
+               [class.text-red-600]="timerIsWarning"
+               [class.animate-pulse]="timerIsCritical">
+            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            {{ timerDisplay }}
+          </div>
 
-            Which algorithm is commonly used for classification tasks in supervised learning?
-
-        </h2>
-
-        <!-- OPTIONS -->
-
-        <div class="space-y-5">
-
-            <!-- OPTION -->
-
-            <div class="option">
-
-                <input type="radio" id="a" name="q1" class="hidden">
-
-                <label for="a"
-                    class="block border border-slate-200 rounded-2xl p-6 cursor-pointer hover:border-blue-500 transition">
-
-                    A. K-Means Clustering
-
-                </label>
-
-            </div>
-
-            <!-- OPTION -->
-
-            <div class="option">
-
-                <input type="radio" id="b" name="q1" class="hidden">
-
-                <label for="b"
-                    class="block border border-slate-200 rounded-2xl p-6 cursor-pointer hover:border-blue-500 transition">
-
-                    B. Linear Regression
-
-                </label>
-
-            </div>
-
-            <!-- OPTION -->
-
-            <div class="option">
-
-                <input type="radio" id="c" name="q1" class="hidden">
-
-                <label for="c"
-                    class="block border border-slate-200 rounded-2xl p-6 cursor-pointer hover:border-blue-500 transition">
-
-                    C. Logistic Regression
-
-                </label>
-
-            </div>
-
-            <!-- OPTION -->
-
-            <div class="option">
-
-                <input type="radio" id="d" name="q1" class="hidden">
-
-                <label for="d"
-                    class="block border border-slate-200 rounded-2xl p-6 cursor-pointer hover:border-blue-500 transition">
-
-                    D. PCA
-
-                </label>
-
-            </div>
+          <!-- Submit Button -->
+          <button (click)="submitExam()"
+                  [disabled]="submitting"
+                  class="px-6 py-3 rounded-2xl bg-red-500 hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition text-white font-semibold">
+            {{ submitting ? 'Submitting...' : 'Submit Exam' }}
+          </button>
 
         </div>
+      </div>
+    </header>
 
-        <!-- NAVIGATION -->
+    <!-- Scrollable Body -->
+    <main class="flex-1 px-8 py-8 max-w-4xl mx-auto w-full">
 
-        <div class="flex justify-between mt-8">
-
-            <button class="px-6 py-4 rounded-2xl border border-slate-300 hover:bg-slate-100 transition font-semibold">
-
-                Previous
-
+      <!-- Question Progress Dots -->
+      @if (questions.length > 0) {
+        <div class="flex items-center gap-2 mb-8 flex-wrap">
+          @for (q of questions; track q.id; let i = $index) {
+            <button (click)="currentIndex = i"
+                    class="w-9 h-9 rounded-full text-sm font-semibold transition-colors border"
+                    [class.bg-blue-600]="i === currentIndex"
+                    [class.text-white]="i === currentIndex"
+                    [class.border-blue-600]="i === currentIndex"
+                    [class.bg-white]="i !== currentIndex"
+                    [class.text-slate-600]="i !== currentIndex"
+                    [class.border-slate-200]="i !== currentIndex">
+              {{ i + 1 }}
             </button>
+          }
+        </div>
+      }
 
-            <button
-                class="px-6 py-4 rounded-2xl bg-blue-600 hover:bg-blue-700 transition text-white font-semibold shadow-lg shadow-blue-100">
+      <!-- Question Card -->
+      @if (currentQuestion) {
+        <div class="bg-white border border-slate-200 rounded-3xl p-10 shadow-sm mb-6">
 
-                Next Question
+          <!-- Question Meta Row -->
+          <div class="flex items-center justify-between mb-6">
+            <span class="px-4 py-2 rounded-full bg-blue-50 text-blue-600 font-medium text-sm">
+              Question {{ currentIndex + 1 }} / {{ questions.length }}
+            </span>
+            <span class="text-slate-500 text-sm font-medium">{{ currentQuestion.points }} pt(s)</span>
+          </div>
 
-            </button>
+          <!-- Question Text -->
+          <h2 class="text-2xl font-bold leading-relaxed mb-8">{{ currentQuestion.questionText }}</h2>
+
+          <!-- OPEN: free-text textarea -->
+          @if (currentQuestion.type === 'OPEN') {
+            <textarea
+              class="w-full border border-slate-200 rounded-2xl p-5 text-base resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition min-h-36"
+              placeholder="Write your answer here..."
+              [value]="getTextAnswer(currentQuestion.id)"
+              (input)="setTextAnswer(currentQuestion.id, $any($event.target).value)">
+            </textarea>
+          }
+
+          <!-- QCM_SINGLE | TRUE_FALSE: radio buttons -->
+          @if (currentQuestion.type === 'QCM_SINGLE' || currentQuestion.type === 'TRUE_FALSE') {
+            <div class="space-y-4">
+              @for (choice of currentQuestion.choices; track choice.id) {
+                <label class="flex items-center gap-4 border rounded-2xl p-5 cursor-pointer transition-colors"
+                       [class.border-blue-500]="getSelectedChoiceId(currentQuestion.id) === choice.id"
+                       [class.bg-blue-50]="getSelectedChoiceId(currentQuestion.id) === choice.id"
+                       [class.border-slate-200]="getSelectedChoiceId(currentQuestion.id) !== choice.id">
+                  <input type="radio"
+                         class="w-5 h-5 accent-blue-600 shrink-0"
+                         [name]="'q-' + currentQuestion.id"
+                         [value]="choice.id"
+                         [checked]="getSelectedChoiceId(currentQuestion.id) === choice.id"
+                         (change)="setSelectedChoiceId(currentQuestion.id, choice.id)">
+                  <span class="text-base leading-relaxed">
+                    <span class="font-semibold mr-2">{{ choice.label }}.</span>{{ choice.text }}
+                  </span>
+                </label>
+              }
+            </div>
+          }
+
+          <!-- QCM_MULTIPLE: checkboxes -->
+          @if (currentQuestion.type === 'QCM_MULTIPLE') {
+            <p class="text-sm text-slate-400 mb-4">Select all that apply.</p>
+            <div class="space-y-4">
+              @for (choice of currentQuestion.choices; track choice.id) {
+                <label class="flex items-center gap-4 border rounded-2xl p-5 cursor-pointer transition-colors"
+                       [class.border-blue-500]="isChoiceSelected(currentQuestion.id, choice.id)"
+                       [class.bg-blue-50]="isChoiceSelected(currentQuestion.id, choice.id)"
+                       [class.border-slate-200]="!isChoiceSelected(currentQuestion.id, choice.id)">
+                  <input type="checkbox"
+                         class="w-5 h-5 accent-blue-600 shrink-0"
+                         [checked]="isChoiceSelected(currentQuestion.id, choice.id)"
+                         (change)="toggleChoice(currentQuestion.id, choice.id)">
+                  <span class="text-base leading-relaxed">
+                    <span class="font-semibold mr-2">{{ choice.label }}.</span>{{ choice.text }}
+                  </span>
+                </label>
+              }
+            </div>
+          }
 
         </div>
 
-    </div>
-    <div class="flex justify-between mt-4">
-        <div class="bg-blue-600 rounded-3xl p-2 pr-6 pl-6 text-white">
-
-            <p class="text-sm opacity-80 mb-2">
-                Remaining Time
-            </p>
-
-            <h1 class="text-2xl text-center font-semibold">
-                42:18
-            </h1>
+        <!-- Prev / Next Navigation -->
+        <div class="flex justify-between">
+          <button (click)="navigate(-1)"
+                  [disabled]="currentIndex === 0"
+                  class="px-6 py-4 rounded-2xl border border-slate-300 font-semibold hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition">
+            Previous
+          </button>
+          <button (click)="navigate(1)"
+                  [disabled]="currentIndex === questions.length - 1"
+                  class="px-6 py-4 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-lg shadow-blue-100 disabled:opacity-40 disabled:cursor-not-allowed transition">
+            Next Question
+          </button>
         </div>
-        <div class="bg-white border border-slate-200 rounded-3xl p-2 pr-6 pl-6">
-            <p class="text-sm text-slate-500 mb-2">
-                Exam Duration
-            </p>
+      }
 
-            <h3 class="text-lg text-center font-semibold">
-                60 Min
-            </h3>
+      <!-- Empty questions fallback -->
+      @if (questions.length === 0) {
+        <div class="bg-white border border-slate-200 rounded-3xl p-10 text-center text-slate-400">
+          No questions are available for this exam.
         </div>
+      }
 
-    </div>
-</main>
+    </main>
+  }
+
+</div>

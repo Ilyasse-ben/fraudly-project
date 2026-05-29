@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.ilyasse.analyticsservice.dto.StudentGradeDto;
 import net.ilyasse.analyticsservice.entity.StudentLearningProfile;
 import net.ilyasse.analyticsservice.entity.TopicFrequency;
 import net.ilyasse.analyticsservice.entity.TutorInteraction;
@@ -137,6 +138,26 @@ public class LearningAnalyticsServiceImpl implements LearningAnalyticsService {
                 : null
         );
         return payload;
+    }
+
+    @Override
+    public List<StudentGradeDto> getStudentsGrades(UUID courseId) {
+        // Logic: In a real scenario, you fetch raw exam attempts from the Assessment Service
+        // For now, returning mock data that matches your frontend requirements
+        return List.of(
+                StudentGradeDto.builder()
+                        .studentId(UUID.randomUUID())
+                        .studentName("Ilyasse Ben Taleb")
+                        .cc1(17.0).cc2(18.0).exam(16.0).average(17.0)
+                        .status("Excellent")
+                        .build(),
+                StudentGradeDto.builder()
+                        .studentId(UUID.randomUUID())
+                        .studentName("Ahmed Karim")
+                        .cc1(15.0).cc2(13.0).exam(14.0).average(14.0)
+                        .status("Needs Review")
+                        .build()
+        );
     }
 
     private void syncStudentProfile(UUID studentId, UUID courseId) {

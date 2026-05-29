@@ -9,20 +9,25 @@ import { DashbordProf } from './dashbord-prof/dashbord-prof';
 import { Assistant } from './assistant/assistant';
 import { ListExemane } from './list-exemane/list-exemane';
 import { Login } from './login/login';
+import { Inscription } from './inscription/inscription';
+import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
-    {path:"cours",component:Cours},
-    { path: "listexemen", component: ListExemane },
-    { path: "Allcours", component: Allcours },
-    { path: "listEtudiant", component: ListEtudientCours },
-    {path:"createCours", component:Createcours},
-    {path:"chapitre",component:Chapiter},
-    { path: "dashbord", component: DashbordProf },
-    { path: "assistant", component: Assistant },
-    { path: "exemen", component: Examen },
-    {path:"login", component:Login}
+  // Public routes
+  { path: 'login', component: Login },
+  { path: 'inscription', component: Inscription },
 
+  // Protected routes
+  { path: 'dashbord', component: DashbordProf, canActivate: [authGuard] },
+  { path: 'cours', component: Cours, canActivate: [authGuard] },
+  { path: 'Allcours', component: Allcours, canActivate: [authGuard] },
+  { path: 'createCours', component: Createcours, canActivate: [authGuard] },
+  { path: 'chapitre', component: Chapiter, canActivate: [authGuard] },
+  { path: 'listEtudiant', component: ListEtudientCours, canActivate: [authGuard] },
+  { path: 'listexemen', component: ListExemane, canActivate: [authGuard] },
+  { path: 'exemen/:id', component: Examen, canActivate: [authGuard] },
+  { path: 'assistant', component: Assistant, canActivate: [authGuard] },
 
-    
-
+  // Default redirect
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
 ];

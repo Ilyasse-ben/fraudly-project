@@ -1,6 +1,7 @@
 package net.ilyasse.analyticsservice.controller;
 
 import lombok.RequiredArgsConstructor;
+import net.ilyasse.analyticsservice.dto.StudentGradeDto;
 import net.ilyasse.analyticsservice.service.LearningAnalyticsService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -43,4 +44,11 @@ public class LearningAnalyticsController {
                 learningAnalyticsService.getCourseTopicStats(courseId)
         );
     }
+    // Inside LearningAnalyticsController.java
+
+    @GetMapping("/courses/{courseId}/grades")
+    public ResponseEntity<List<StudentGradeDto>> getStudentsGrades(@PathVariable UUID courseId) {
+        return ResponseEntity.ok(learningAnalyticsService.getStudentsGrades(courseId));
+    }
+
 }

@@ -3,6 +3,20 @@ spring:
     name: gateway-service
   cloud:
     gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:4200"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders:
+              - "*"
+            allowCredentials: true
       # THIS IS MANDATORY for dynamic routing
       discovery:
         locator:
@@ -30,7 +44,7 @@ spring:
         - id: analytics-service
           uri: lb://analytics-service
           predicates:
-            - Path=/api/analytics/**a
+            - Path=/api/analytics/**
           filters:
             - StripPrefix=0
         - id: proctoring-service
