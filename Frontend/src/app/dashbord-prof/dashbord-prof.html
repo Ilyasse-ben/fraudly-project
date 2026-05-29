@@ -1,0 +1,113 @@
+<main class="flex-1 p-12">
+  <div class="mb-10">
+    <h1 class="text-5xl font-bold mb-3">Professor Dashboard</h1>
+    <p class="text-slate-500 text-lg">
+      Monitor students performance, grades and course analytics
+    </p>
+  </div>
+
+  <div class="grid grid-cols-4 gap-6 mb-10">
+    <div class="bg-white border border-slate-200 rounded-3xl p-7">
+      <p class="text-slate-500 mb-3">Total Students</p>
+      <h2 class="text-4xl font-bold">{{ stats.totalStudents }}</h2>
+    </div>
+    <div class="bg-white border border-slate-200 rounded-3xl p-7">
+      <p class="text-slate-500 mb-3">Active Courses</p>
+      <h2 class="text-4xl font-bold">{{ stats.activeCourses }}</h2>
+    </div>
+    <div class="bg-white border border-slate-200 rounded-3xl p-7">
+      <p class="text-slate-500 mb-3">Class Average</p>
+      <h2 class="text-4xl font-bold text-blue-600">{{ stats.classAverage }} / 20</h2>
+    </div>
+    <div class="bg-white border border-slate-200 rounded-3xl p-7">
+      <p class="text-slate-500 mb-3">Exams Completed</p>
+      <h2 class="text-4xl font-bold">{{ stats.examsCompleted }}</h2>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-12 gap-8 mb-10">
+    <div class="col-span-8 bg-white border border-slate-200 rounded-3xl p-8">
+      <div class="flex items-center justify-between mb-8">
+        <div>
+          <h2 class="text-3xl font-bold mb-2">Students Performance</h2>
+          <p class="text-slate-500">Average questions by subject</p>
+        </div>
+      </div>
+
+      <div class="space-y-6">
+        @for (stat of courseStats; track stat.topic) {
+          <div>
+            <div class="flex justify-between mb-2">
+              <span class="font-medium">{{ stat.topic }}</span>
+              <span class="text-slate-500">{{ stat.totalQuestions }} questions</span>
+            </div>
+            <div class="w-full bg-slate-100 rounded-full h-4">
+              <div class="bg-blue-600 h-4 rounded-full" [style.width.%]="calculatePercentage(stat.totalQuestions)"></div>
+            </div>
+          </div>
+        } @empty {
+          <p class="text-slate-400">No analytics data available.</p>
+        }
+      </div>
+    </div>
+
+    <!-- TODO: wire topStudents once a dedicated endpoint is available
+    <div class="col-span-4 bg-white border border-slate-200 rounded-3xl p-8">
+      <h2 class="text-2xl font-bold mb-6">Top Students</h2>
+      <div class="space-y-5">
+        @for (student of topStudents; track student.id) {
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
+                {{ student.initials }}
+              </div>
+              <div>
+                <h3 class="font-semibold">{{ student.name }}</h3>
+                <p class="text-sm text-slate-500">{{ student.topSubject }}</p>
+              </div>
+            </div>
+            <span class="font-bold text-blue-600">{{ student.grade }}</span>
+          </div>
+        }
+      </div>
+    </div>
+    -->
+  </div>
+
+  <div class="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
+    <div class="flex items-center justify-between px-8 py-6 border-b border-slate-200">
+      <div>
+        <h2 class="text-3xl font-bold mb-2">Students Grades</h2>
+      </div>
+      <select class="px-5 py-3 rounded-2xl border border-slate-200 bg-slate-50">
+        <option>Machine Learning</option>
+        <option>Cloud Computing</option>
+      </select>
+    </div>
+
+    <div class="grid grid-cols-6 gap-4 px-8 py-5 bg-slate-50 border-b border-slate-200 text-sm font-semibold text-slate-500">
+      <div>Student</div>
+      <div>CC 1</div>
+      <div>CC 2</div>
+      <div>Exam</div>
+      <div>Average</div>
+      <div>Status</div>
+    </div>
+
+    @for (row of studentsGrades; track row.studentId) {
+      <div class="grid grid-cols-6 gap-4 px-8 py-6 border-b border-slate-100 items-center hover:bg-slate-50 transition">
+        <div class="font-semibold">{{ row.studentName }}</div>
+        <div>{{ row.cc1 }} / 20</div>
+        <div>{{ row.cc2 }} / 20</div>
+        <div>{{ row.exam }} / 20</div>
+        <div class="font-bold text-blue-600">{{ row.average }}</div>
+        <div>
+                    <span class="px-4 py-2 rounded-full text-sm font-medium"
+                          [class]="row.status === 'Excellent' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'">
+                        {{ row.status }}
+                    </span>
+        </div>
+      </div>
+    }
+  </div>
+</main>
