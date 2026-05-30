@@ -99,6 +99,19 @@ export interface UpdateQuestionRequest {
   choices?: UpdateChoiceRequest[] | null;
 }
 
+export interface ExamConfigRequest {
+  title: string;
+  courseId: string;
+  professorId: string;
+  durationMinutes: number;
+  difficulty: string;
+  nbQcm: number;
+  qcmType: string;
+  nbTrueFalse: number;
+  nbOpen: number;
+  chapterIds: string[];
+}
+
 // Request interface for the AI generation endpoint
 export interface BackendAiGenerationRequest {
   topic: string;

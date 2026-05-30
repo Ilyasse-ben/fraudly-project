@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-import { AssessmentService } from '../service/assessment.service';
-import { BackendAiGenerationRequest, Difficulty } from '../models/assessment.model';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { AssessmentService } from '../service/assessment.service';
+import { ExamConfigRequest } from '../models/assessment.model';
 
 @Component({
   selector: 'app-exam-builder',
@@ -12,26 +12,30 @@ import { CommonModule } from '@angular/common';
   templateUrl: './exam-builder.html'
 })
 export class ExamBuilderComponent implements OnInit {
+  private readonly COURSE1_ID = '66666666-6666-6666-6666-666666666666';
+
   builderForm: FormGroup;
   loading = false;
   error: string | null = null;
-  difficulties: Difficulty[] = ['EASY', 'MEDIUM', 'HARD', 'VERY_HARD'];
+
+  readonly difficulties = ['EASY', 'MEDIUM', 'HARD', 'VERY_HARD'];
+  readonly qcmTypes = ['QCM_SINGLE', 'QCM_MULTIPLE'];
 
   constructor(
     private fb: FormBuilder,
     private assessmentService: AssessmentService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {
     this.builderForm = this.fb.group({
-      topic: ['', Validators.required],
-      difficulty: ['MEDIUM', Validators.required],
-      total_questions: [10, [Validators.required, Validators.min(1)]],
-      qcm_count: [5, Validators.min(0)],
-      true_false_count: [3, Validators.min(0)],
-      open_count: [2, Validators.min(0)],
-      include_explanations: [true],
-      professor_instructions: [''],
-      top_k: [3]
+      title:          ['', Validators.required],
+      durationMinutes:[60, [Validators.required, Validators.min(1)]],
+      difficulty:     ['MEDIUM', Validators.required],
+      nbQcm:          [5,  [Validators.required, Validators.min(0)]],
+      qcmType:        ['QCM_SINGLE', Validators.required],
+      nbTrueFalse:    [3,  [Validators.required, Validators.min(0)]],
+      nbOpen:         [2,  [Validators.required, Validators.min(0)]],
+      chapterIds:     [''],
     });
   }
 
@@ -41,25 +45,37 @@ export class ExamBuilderComponent implements OnInit {
     if (this.builderForm.invalid) return;
 
     const professorId = this.extractUserIdFromToken();
+    const courseId = this.route.snapshot.queryParamMap.get('courseId') ?? this.COURSE1_ID;
+
+    const raw = this.builderForm.value;
+    const chapterIds: string[] = raw.chapterIds
+      ? (raw.chapterIds as string).split(',').map((s: string) => s.trim()).filter((s: string) => s.length > 0)
+      : [];
+
+    const request: ExamConfigRequest = {
+      title:          raw.title,
+      courseId,
+      professorId:    professorId ?? '',
+      durationMinutes: raw.durationMinutes,
+      difficulty:     raw.difficulty,
+      nbQcm:          raw.nbQcm,
+      qcmType:        raw.qcmType,
+      nbTrueFalse:    raw.nbTrueFalse,
+      nbOpen:         raw.nbOpen,
+      chapterIds,
+    };
 
     this.loading = true;
     this.error = null;
 
-    const request: BackendAiGenerationRequest = {
-      ...this.builderForm.value,
-      course_id: '66666666-6666-6666-6666-666666666666',
-      chapter_ids: [],
-      professor_id: professorId ?? '',
-    };
-
-    this.assessmentService.generateExam(request).subscribe({
+    this.assessmentService.createExam(request).subscribe({
       next: () => {
         this.loading = false;
         this.router.navigate(['/listexemen']);
       },
       error: (err) => {
         this.loading = false;
-        this.error = err.message || 'Failed to generate exam';
+        this.error = err?.error?.message ?? err?.message ?? 'Failed to create exam. Please try again.';
       }
     });
   }

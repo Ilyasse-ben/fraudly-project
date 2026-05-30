@@ -8,11 +8,20 @@
       </p>
     </div>
 
-    <div class="bg-white border border-slate-200 rounded-2xl px-6 py-4 shadow-sm">
-      <p class="text-sm text-slate-500 mb-1">Published Exams</p>
-      <h2 class="text-3xl font-bold text-blue-600">
-        {{ pendingCount }}
-      </h2>
+    <div class="flex items-center gap-4">
+      @if (isTeacher) {
+        <button
+          (click)="openCreateExam()"
+          class="px-6 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-semibold transition">
+          + Create Exam
+        </button>
+      }
+      <div class="bg-white border border-slate-200 rounded-2xl px-6 py-4 shadow-sm">
+        <p class="text-sm text-slate-500 mb-1">Published Exams</p>
+        <h2 class="text-3xl font-bold text-blue-600">
+          {{ pendingCount }}
+        </h2>
+      </div>
     </div>
   </div>
 
@@ -116,3 +125,39 @@
     </div>
   }
 </main>
+
+@if (showCourseModal) {
+  <!-- Modal backdrop -->
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+       (click)="showCourseModal = false">
+
+    <!-- Modal card — stop propagation so clicking inside doesn't close it -->
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md mx-4 p-8"
+         (click)="$event.stopPropagation()">
+
+      <!-- Header -->
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl font-bold text-slate-800">Select a Course</h2>
+        <button
+          (click)="showCourseModal = false"
+          class="w-9 h-9 flex items-center justify-center rounded-xl text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition text-xl font-semibold">
+          ✕
+        </button>
+      </div>
+
+      <!-- Course list -->
+      <div class="flex flex-col gap-3">
+        @for (course of courses; track course.id) {
+          <button
+            (click)="selectCourseForExam(course.id)"
+            class="w-full text-left px-5 py-4 rounded-2xl border border-slate-200 hover:border-blue-400 hover:bg-blue-50 transition group">
+            <span class="text-base font-semibold text-slate-700 group-hover:text-blue-700">
+              {{ course.title }}
+            </span>
+          </button>
+        }
+      </div>
+
+    </div>
+  </div>
+}

@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { DatePipe, CommonModule } from '@angular/common';
-import { RouterLink, ActivatedRoute } from '@angular/router';
+import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { AssessmentService } from '../service/assessment.service';
 import { AuthService } from '../core/services/auth.service';
 import { ExamResponse, Difficulty } from '../models/assessment.model';
@@ -18,11 +18,18 @@ export class ListExemane implements OnInit {
   error = '';
   isTeacher = false;
   isStudent = false;
+  showCourseModal = false;
   private actionLoadingIds = new Set<string>();
+
+  readonly courses = [
+    { id: '66666666-6666-6666-6666-666666666666', title: 'Machine Learning' },
+    { id: '77777777-7777-7777-7777-777777777777', title: 'Cloud Computing' },
+  ];
 
   constructor(
     private assessmentService: AssessmentService,
     private route: ActivatedRoute,
+    private router: Router,
     private cdr: ChangeDetectorRef,
     private authService: AuthService
   ) {}
@@ -85,6 +92,15 @@ export class ListExemane implements OnInit {
         this.cdr.detectChanges();
       },
     });
+  }
+
+  openCreateExam(): void {
+    this.showCourseModal = true;
+  }
+
+  selectCourseForExam(courseId: string): void {
+    this.showCourseModal = false;
+    this.router.navigate(['/exam-builder'], { queryParams: { courseId } });
   }
 
   isActionLoading(examId: string): boolean {

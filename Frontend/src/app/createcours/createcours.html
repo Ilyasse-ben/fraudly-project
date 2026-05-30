@@ -1,72 +1,87 @@
-<div class=" px-20 py-10">
-    <!-- PAGE HEADER -->
+<main class="flex-1 px-20 py-10">
 
-    <div class="mb-10">
+  <!-- PAGE HEADER -->
+  <div class="mb-10">
+    <h1 class="text-5xl font-bold mb-3">Create New Course</h1>
+    <p class="text-slate-500 text-lg">Create and manage educational content for your students</p>
+  </div>
 
-        <h1 class="text-5xl font-bold mb-3">
-            Create New Course
-        </h1>
-
-        <p class="text-slate-500 text-lg">
-            Create and manage educational content for your students
-        </p>
-
+  @if (error) {
+    <div class="px-6 py-4 mb-8 rounded-2xl bg-red-50 border border-red-200 text-red-700 font-medium">
+      {{ error }}
     </div>
+  }
 
-    <!-- FORM CARD -->
+  <!-- FORM CARD -->
+  <div class="bg-white border border-slate-200 rounded-3xl p-10 max-w-5xl">
+    <form [formGroup]="courseForm" (ngSubmit)="onSubmit()" class="space-y-8">
 
-    <div class="bg-white border border-slate-200 rounded-3xl p-10 max-w-5xl">
+      <!-- TITLE -->
+      <div>
+        <label class="block text-sm font-semibold text-slate-700 mb-3">
+          Course Title <span class="text-red-400">*</span>
+        </label>
+        <input
+          formControlName="title"
+          type="text"
+          placeholder="Example: Machine Learning"
+          class="w-full px-5 py-4 rounded-2xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition" />
+      </div>
 
-        <form class="space-y-8">
+      <!-- DESCRIPTION -->
+      <div>
+        <label class="block text-sm font-semibold text-slate-700 mb-3">
+          Course Description <span class="text-red-400">*</span>
+        </label>
+        <textarea
+          formControlName="description"
+          rows="5"
+          placeholder="Describe your course..."
+          class="w-full px-5 py-4 rounded-2xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition resize-none">
+        </textarea>
+      </div>
 
-            <!-- COURSE TITLE -->
+      <!-- CATEGORY + CODE -->
+      <div class="grid grid-cols-2 gap-6">
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-3">
+            Category <span class="text-red-400">*</span>
+          </label>
+          <input
+            formControlName="category"
+            type="text"
+            placeholder="e.g., Computer Science"
+            class="w-full px-5 py-4 rounded-2xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition" />
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-3">
+            Course Code <span class="text-red-400">*</span>
+          </label>
+          <input
+            formControlName="coursCode"
+            type="text"
+            placeholder="e.g., ML101"
+            class="w-full px-5 py-4 rounded-2xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition" />
+        </div>
+      </div>
 
-            <div>
+      <!-- ACTIONS -->
+      <div class="flex justify-end gap-5 pt-5">
+        <button
+          type="button"
+          (click)="cancel()"
+          class="px-8 py-4 rounded-2xl border border-slate-300 hover:bg-slate-100 transition font-semibold">
+          Cancel
+        </button>
+        <button
+          type="submit"
+          [disabled]="courseForm.invalid || loading"
+          class="px-8 py-4 rounded-2xl bg-blue-600 hover:bg-blue-700 transition text-white font-semibold shadow-lg shadow-blue-100 disabled:opacity-50 disabled:cursor-not-allowed">
+          {{ loading ? 'Creating...' : 'Create Course' }}
+        </button>
+      </div>
 
-                <label class="block text-sm font-semibold text-slate-700 mb-3">
-                    Course Title
-                </label>
+    </form>
+  </div>
 
-                <input type="text" placeholder="Example: Machine Learning"
-                    class="w-full px-5 py-4 rounded-2xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition" />
-
-            </div>
-
-            <!-- COURSE DESCRIPTION -->
-
-            <div>
-
-                <label class="block text-sm font-semibold text-slate-700 mb-3">
-                    Course Description
-                </label>
-
-                <textarea rows="5" placeholder="Describe your course..."
-                    class="w-full px-5 py-4 rounded-2xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition resize-none"></textarea>
-
-            </div>
-
-            <!-- ACTIONS -->
-
-            <div class="flex justify-end gap-5 pt-5">
-
-                <button type="button"
-                    class="px-8 py-4 rounded-2xl border border-slate-300 hover:bg-slate-100 transition font-semibold">
-
-                    Cancel
-
-                </button>
-
-                <button type="submit"
-                    class="px-8 py-4 rounded-2xl bg-blue-600 hover:bg-blue-700 transition text-white font-semibold shadow-lg shadow-blue-100">
-
-                    Create Course
-
-                </button>
-
-            </div>
-
-        </form>
-
-    </div>
-
-</div>
+</main>

@@ -34,14 +34,14 @@
             Exams
           </a>
 
+          <a routerLink="/Allcours" routerLinkActive="bg-blue-50 text-blue-600 font-semibold"
+            class="block px-4 py-3 rounded-xl text-slate-600 hover:bg-slate-100 transition duration-300">
+            Courses
+          </a>
+
           <a routerLink="/proctoring-review" routerLinkActive="bg-blue-50 text-blue-600 font-semibold"
             class="block px-4 py-3 rounded-xl text-slate-600 hover:bg-slate-100 transition duration-300">
             Proctoring Review
-          </a>
-
-          <a routerLink="/dashbord" routerLinkActive="bg-blue-50 text-blue-600 font-semibold"
-            class="block px-4 py-3 rounded-xl text-slate-600 hover:bg-slate-100 transition duration-300">
-            Analytics
           </a>
 
           <a routerLink="/assistant" routerLinkActive="bg-blue-50 text-blue-600 font-semibold"
@@ -54,9 +54,9 @@
         <!-- STUDENT navigation -->
         @if (authService.isStudent()) {
 
-          <a routerLink="/listexemen" routerLinkActive="bg-blue-50 text-blue-600 font-semibold"
+          <a routerLink="/Allcours" routerLinkActive="bg-blue-50 text-blue-600 font-semibold"
             class="block px-4 py-3 rounded-xl text-slate-600 hover:bg-slate-100 transition duration-300">
-            Exams
+            Courses
           </a>
 
           <a routerLink="/assistant" routerLinkActive="bg-blue-50 text-blue-600 font-semibold"

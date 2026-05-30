@@ -8,6 +8,7 @@ import {
   StartAttemptRequest,
   SubmitAttemptRequest,
   BackendAiGenerationRequest,
+  ExamConfigRequest,
   OpenAnswerItem,
   UpdateQuestionRequest,
 } from '../models/assessment.model';
@@ -20,6 +21,10 @@ export class AssessmentService {
 
   // Generates a new exam via AI service
   generateExam(request: BackendAiGenerationRequest): Observable<ExamResponse> {
+    return this.http.post<ExamResponse>(`${this.baseUrl}/generate`, request);
+  }
+
+  createExam(request: ExamConfigRequest): Observable<ExamResponse> {
     return this.http.post<ExamResponse>(`${this.baseUrl}/generate`, request);
   }
 
