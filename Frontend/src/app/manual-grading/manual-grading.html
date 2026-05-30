@@ -1,0 +1,99 @@
+<main class="flex-1 p-12">
+
+  <!-- HEADER -->
+  <div class="mb-10">
+    <h1 class="text-4xl font-bold mb-2">Manual Grading</h1>
+    <p class="text-slate-400 text-sm font-mono">{{ examId }}</p>
+  </div>
+
+  @if (loading) {
+    <div class="flex justify-center items-center h-48 text-slate-400 text-lg">
+      Loading open answers...
+    </div>
+  }
+
+  @if (!loading && error) {
+    <div class="px-6 py-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 font-medium">
+      {{ error }}
+    </div>
+  }
+
+  @if (!loading && !error && answers.length === 0) {
+    <div class="flex justify-center items-center h-48 text-slate-400 text-lg">
+      No open answers to grade for this exam.
+    </div>
+  }
+
+  @if (!loading && !error && answers.length > 0) {
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      @for (answer of answers; track answer.answerId) {
+        <div class="bg-white border border-slate-200 rounded-3xl shadow-sm p-6 flex flex-col gap-4">
+
+          <!-- Question text -->
+          <div>
+            <p class="text-xs text-slate-400 uppercase tracking-wide font-semibold mb-1">Question</p>
+            <p class="text-slate-800 font-medium leading-snug">{{ answer.questionText }}</p>
+          </div>
+
+          <!-- Model answer -->
+          <div>
+            <p class="text-xs text-slate-400 uppercase tracking-wide font-semibold mb-1">Model Answer</p>
+            <p class="text-slate-600 text-sm">{{ answer.correctAnswer }}</p>
+          </div>
+
+          <!-- Student answer -->
+          <div>
+            <p class="text-xs text-slate-400 uppercase tracking-wide font-semibold mb-1">Student Answer</p>
+            <p class="text-slate-700 text-sm bg-slate-50 rounded-xl px-4 py-3 min-h-12">
+              {{ answer.studentAnswer ?? '—' }}
+            </p>
+          </div>
+
+          <!-- AI score + badges -->
+          <div class="flex items-center gap-4 text-sm flex-wrap">
+            <div>
+              <span class="text-slate-400 font-medium">AI Score: </span>
+              <span class="font-semibold text-indigo-600">
+                {{ answer.originalAiScore !== null ? answer.originalAiScore : '—' }}
+              </span>
+              <span class="text-slate-400"> / {{ answer.maxPoints }}</span>
+            </div>
+            @if (answer.isGraded) {
+              <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-green-50 text-green-600">
+                Graded
+              </span>
+            }
+            @if (answer.modifiedByProfessor) {
+              <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-600">
+                Overridden
+              </span>
+            }
+          </div>
+
+          <!-- Score input row -->
+          <div class="flex items-center gap-3 pt-3 border-t border-slate-100">
+            <label class="text-sm font-medium text-slate-600 shrink-0">Score:</label>
+            <input
+              type="number"
+              [value]="scoreInputs.get(answer.answerId) ?? 0"
+              [max]="answer.maxPoints"
+              min="0"
+              step="0.5"
+              [disabled]="isUpdating(answer.answerId)"
+              (input)="onScoreInput(answer.answerId, $any($event.target).value)"
+              class="w-24 px-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 disabled:opacity-50" />
+            <span class="text-slate-400 text-sm">/ {{ answer.maxPoints }}</span>
+            <button
+              (click)="updateScore(answer.answerId, answer.maxPoints)"
+              [disabled]="isUpdating(answer.answerId)"
+              class="ml-auto px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed">
+              {{ isUpdating(answer.answerId) ? 'Saving...' : 'Save Score' }}
+            </button>
+          </div>
+
+        </div>
+      }
+    </div>
+  }
+
+</main>

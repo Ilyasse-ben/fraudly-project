@@ -83,6 +83,22 @@ export interface OpenAnswerItem {
   modifiedAt: string | null;
 }
 
+export interface UpdateChoiceRequest {
+  id: string;
+  label: string;
+  text: string;
+  isCorrect: boolean;
+}
+
+export interface UpdateQuestionRequest {
+  questionText: string;
+  correctAnswer?: string | null;
+  explanation?: string | null;
+  points?: number | null;
+  reason?: string | null;
+  choices?: UpdateChoiceRequest[] | null;
+}
+
 // Request interface for the AI generation endpoint
 export interface BackendAiGenerationRequest {
   topic: string;

@@ -3,37 +3,10 @@
   <!-- HEADER -->
   <div class="flex items-center justify-between mb-10">
     <div>
-      <h1 class="text-4xl font-bold mb-2">Exam Attempts</h1>
-      <p class="text-slate-400 text-sm font-mono">{{ examId }}</p>
+      <h1 class="text-4xl font-bold mb-2">My Attempts</h1>
+      <p class="text-slate-400 text-sm font-mono">{{ studentId }}</p>
     </div>
-
-    @if (!loading && !error) {
-      <div class="flex items-center gap-3">
-        <button
-          (click)="triggerAiGrading()"
-          [disabled]="isGrading"
-          class="px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed">
-          {{ isGrading ? 'Grading...' : 'Trigger AI Grading' }}
-        </button>
-        <a
-          [routerLink]="['/manual-grading', examId]"
-          class="px-6 py-3 rounded-2xl border border-indigo-600 text-indigo-600 hover:bg-indigo-50 font-semibold transition">
-          Manual Grading
-        </a>
-        <a
-          [routerLink]="['/question-editor', examId]"
-          class="px-6 py-3 rounded-2xl border border-slate-300 text-slate-600 hover:bg-slate-50 font-semibold transition">
-          Edit Questions
-        </a>
-      </div>
-    }
   </div>
-
-  @if (gradingError) {
-    <div class="mb-6 px-6 py-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-sm font-medium">
-      {{ gradingError }}
-    </div>
-  }
 
   @if (loading) {
     <div class="flex justify-center items-center h-48 text-slate-400 text-lg">
@@ -49,7 +22,7 @@
 
   @if (!loading && !error && attempts.length === 0) {
     <div class="flex justify-center items-center h-48 text-slate-400 text-lg">
-      No attempts submitted yet.
+      No attempts found.
     </div>
   }
 
@@ -58,7 +31,7 @@
       <table class="w-full text-sm">
         <thead>
           <tr class="border-b border-slate-100 bg-slate-50 text-slate-500 text-xs uppercase tracking-wide">
-            <th class="px-6 py-4 text-left font-semibold">Student ID</th>
+            <th class="px-6 py-4 text-left font-semibold">Exam ID</th>
             <th class="px-6 py-4 text-left font-semibold">Status</th>
             <th class="px-6 py-4 text-left font-semibold">Score</th>
             <th class="px-6 py-4 text-left font-semibold">Started</th>
@@ -68,7 +41,7 @@
         <tbody class="divide-y divide-slate-100">
           @for (attempt of attempts; track attempt.id) {
             <tr class="hover:bg-slate-50 transition">
-              <td class="px-6 py-4 font-mono text-xs text-slate-700">{{ attempt.studentId }}</td>
+              <td class="px-6 py-4 font-mono text-xs text-slate-700">{{ attempt.examId }}</td>
               <td class="px-6 py-4">
                 <span class="px-3 py-1 rounded-full text-xs font-semibold" [class]="statusClass(attempt.status)">
                   {{ attempt.status }}

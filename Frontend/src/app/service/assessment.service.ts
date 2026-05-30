@@ -9,6 +9,7 @@ import {
   SubmitAttemptRequest,
   BackendAiGenerationRequest,
   OpenAnswerItem,
+  UpdateQuestionRequest,
 } from '../models/assessment.model';
 
 @Injectable({ providedIn: 'root' })
@@ -75,5 +76,15 @@ export class AssessmentService {
 
   getAttemptsByStudent(studentId: string): Observable<ExamAttemptResponse[]> {
     return this.http.get<ExamAttemptResponse[]>(`${this.baseUrl}/attempts/student/${studentId}`);
+  }
+
+  updateQuestion(questionId: string, request: UpdateQuestionRequest, professorId: string): Observable<ExamResponse> {
+    const params = new HttpParams().set('professorId', professorId);
+    return this.http.put<ExamResponse>(`${this.baseUrl}/questions/${questionId}`, request, { params });
+  }
+
+  deleteQuestion(questionId: string, examId: string): Observable<ExamResponse> {
+    const params = new HttpParams().set('examId', examId);
+    return this.http.delete<ExamResponse>(`${this.baseUrl}/questions/${questionId}`, { params });
   }
 }

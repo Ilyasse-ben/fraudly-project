@@ -20,6 +20,8 @@ export class DashbordProf implements OnInit {
     examsCompleted: 0
   };
 
+  loading = true;
+  error = '';
   courseStats: TopicStats[] = [];
   topStudents: any[] = [];
   studentsGrades: StudentGrade[] = [];
@@ -33,16 +35,28 @@ export class DashbordProf implements OnInit {
     const courseId = 'f47ac10b-58cc-4372-a567-0e02b2c3d479';
 
     // 1. Populate Course Statistics
-    this.analyticsService.getCourseTopicStats(courseId).subscribe(data => {
-      this.courseStats = data;
+    this.analyticsService.getCourseTopicStats(courseId).subscribe({
+      next: (data) => {
+        this.courseStats = data;
+        this.loading = false;
+      },
+      error: () => {
+        this.loading = false;
+        this.error = 'Failed to load analytics data.';
+      },
     });
 
     // 2. Populate Grades Table
-    this.analyticsService.getStudentsGrades(courseId).subscribe(data => {
-      this.studentsGrades = data;
-
-      // Calculate global stats dynamically based on the returned list
-      this.updateStats(data);
+    this.analyticsService.getStudentsGrades(courseId).subscribe({
+      next: (data) => {
+        this.studentsGrades = data;
+        this.updateStats(data);
+        this.loading = false;
+      },
+      error: () => {
+        this.loading = false;
+        this.error = 'Failed to load grades data.';
+      },
     });
   }
 

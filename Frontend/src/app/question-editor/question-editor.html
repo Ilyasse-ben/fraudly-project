@@ -1,0 +1,118 @@
+<main class="flex-1 p-12">
+
+  <!-- HEADER -->
+  <div class="flex items-center justify-between mb-10">
+    <div>
+      <h1 class="text-4xl font-bold mb-2">Edit Questions</h1>
+      @if (exam) {
+        <p class="text-slate-600 text-base font-medium">{{ exam.title }}</p>
+      }
+      <p class="text-slate-400 text-sm font-mono">{{ examId }}</p>
+    </div>
+    <a
+      [routerLink]="['/exam-attempts', examId]"
+      class="px-6 py-3 rounded-2xl border border-slate-300 text-slate-600 hover:bg-slate-50 font-semibold transition">
+      ← Back to Attempts
+    </a>
+  </div>
+
+  @if (loading) {
+    <div class="flex justify-center items-center h-48 text-slate-400 text-lg">
+      Loading questions...
+    </div>
+  }
+
+  @if (!loading && error) {
+    <div class="px-6 py-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 font-medium">
+      {{ error }}
+    </div>
+  }
+
+  @if (!loading && !error && questionForms.length === 0) {
+    <div class="flex justify-center items-center h-48 text-slate-400 text-lg">
+      No questions found for this exam.
+    </div>
+  }
+
+  @if (!loading && !error && questionForms.length > 0) {
+    <div class="flex flex-col gap-6">
+      @for (form of questionForms; track form.id) {
+        <div class="bg-white border border-slate-200 rounded-3xl shadow-sm p-8">
+
+          <!-- Question card header -->
+          <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center gap-3">
+              <span class="text-slate-400 text-sm font-mono font-semibold">Q{{ form.orderIndex }}</span>
+              <span class="px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-600">
+                {{ form.type }}
+              </span>
+            </div>
+            <div class="flex items-center gap-3">
+              <button
+                (click)="saveQuestion(form.id)"
+                [disabled]="isSaving(form.id) || isDeleting(form.id)"
+                class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed">
+                {{ isSaving(form.id) ? 'Saving...' : 'Save' }}
+              </button>
+              <button
+                (click)="deleteQuestion(form.id)"
+                [disabled]="isSaving(form.id) || isDeleting(form.id)"
+                class="px-5 py-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 text-sm font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed">
+                {{ isDeleting(form.id) ? 'Deleting...' : 'Delete' }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Form fields -->
+          <div class="grid grid-cols-1 gap-5">
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Question Text</label>
+              <textarea
+                [(ngModel)]="form.questionText"
+                rows="3"
+                class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-300 resize-none">
+              </textarea>
+            </div>
+
+            <div class="grid grid-cols-2 gap-5">
+              <div>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Correct Answer</label>
+                <input
+                  type="text"
+                  [(ngModel)]="form.correctAnswer"
+                  class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Points</label>
+                <input
+                  type="number"
+                  [(ngModel)]="form.points"
+                  min="0"
+                  class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Explanation</label>
+              <input
+                type="text"
+                [(ngModel)]="form.explanation"
+                class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Edit Reason</label>
+              <input
+                type="text"
+                [(ngModel)]="form.reason"
+                placeholder="Why are you modifying this question?"
+                class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+            </div>
+          </div>
+
+        </div>
+      }
+    </div>
+  }
+
+</main>

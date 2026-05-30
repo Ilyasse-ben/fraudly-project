@@ -15,6 +15,8 @@ import { ExamBuilderComponent } from './exam-builder/exam-builder';
 import { ProctoringReview } from './proctoring-review/proctoring-review';
 import { ExamAttemptsComponent } from './exam-attempts/exam-attempts';
 import { ManualGradingComponent } from './manual-grading/manual-grading';
+import { QuestionEditorComponent } from './question-editor/question-editor';
+import { StudentAttemptsComponent } from './student-attempts/student-attempts';
 
 export const routes: Routes = [
   // Public routes
@@ -35,6 +37,8 @@ export const routes: Routes = [
   { path: 'proctoring-review', component: ProctoringReview, canActivate: [authGuard] },
   { path: 'exam-attempts/:examId', component: ExamAttemptsComponent, canActivate: [authGuard] },
   { path: 'manual-grading/:examId', component: ManualGradingComponent, canActivate: [authGuard] },
+  { path: 'question-editor/:examId', component: QuestionEditorComponent, canActivate: [authGuard] },
+  { path: 'student-attempts/:studentId', component: StudentAttemptsComponent, canActivate: [authGuard] },
 
   // Default redirect
   { path: '', redirectTo: 'login', pathMatch: 'full' },
