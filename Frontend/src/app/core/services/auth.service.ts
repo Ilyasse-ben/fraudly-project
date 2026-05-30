@@ -53,4 +53,23 @@ export class AuthService {
   isLoggedIn(): boolean {
     return !!this.getToken();
   }
+
+  getUserRole(): string | null {
+    const token = this.getToken();
+    if (!token) return null;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1])) as Record<string, unknown>;
+      return (payload['role'] as string) ?? null;
+    } catch {
+      return null;
+    }
+  }
+
+  isProfessor(): boolean {
+    return this.getUserRole() === 'ROLE_TEACHER';
+  }
+
+  isStudent(): boolean {
+    return this.getUserRole() === 'ROLE_STUDENT';
+  }
 }

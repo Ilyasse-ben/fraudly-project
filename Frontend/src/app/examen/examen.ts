@@ -9,6 +9,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AssessmentService } from '../service/assessment.service';
 import { ProctoringService } from '../service/proctoring.service';
+import { AuthService } from '../core/services/auth.service';
 import {
   ExamAttemptResponse,
   ExamQuestionResponse,
@@ -38,6 +39,7 @@ export class Examen implements OnInit, OnDestroy {
   error: string | null = null;
   submitted = false;
   submitting = false;
+  isProfessorPreview = false;
 
   currentIndex = 0;
   secondsRemaining = 0;
@@ -51,11 +53,13 @@ export class Examen implements OnInit, OnDestroy {
     private router: Router,
     private assessmentService: AssessmentService,
     private proctoringService: ProctoringService,
+    private authService: AuthService,
   ) {}
 
   ngOnInit(): void {
     const examId = this.route.snapshot.paramMap.get('id');
     const userId = this.extractUserIdFromToken();
+    this.isProfessorPreview = this.authService.isProfessor();
 
     if (!examId || !userId) {
       this.error = 'Missing exam or user information.';
@@ -63,6 +67,23 @@ export class Examen implements OnInit, OnDestroy {
       return;
     }
 
+    if (this.isProfessorPreview) {
+      // Professor: load exam read-only, no attempt, no proctoring
+      this.assessmentService.getExam(examId).subscribe({
+        next: (exam) => {
+          this.exam = exam;
+          this.initAnswerMap(exam);
+          this.loading = false;
+        },
+        error: () => {
+          this.error = 'Failed to load the exam. Please try again.';
+          this.loading = false;
+        },
+      });
+      return;
+    }
+
+    // Student: full flow with attempt + proctoring
     this.assessmentService.getExam(examId).subscribe({
       next: (exam) => {
         this.exam = exam;
@@ -170,6 +191,7 @@ export class Examen implements OnInit, OnDestroy {
   }
 
   setSelectedChoiceId(questionId: string, choiceId: string): void {
+    if (this.isProfessorPreview) return;
     const state = this.answers.get(questionId);
     if (state) state.selectedChoiceId = choiceId;
   }
@@ -180,6 +202,7 @@ export class Examen implements OnInit, OnDestroy {
   }
 
   toggleChoice(questionId: string, choiceId: string): void {
+    if (this.isProfessorPreview) return;
     const state = this.answers.get(questionId);
     if (!state) return;
     const idx = state.selectedChoiceIds.indexOf(choiceId);
@@ -196,6 +219,7 @@ export class Examen implements OnInit, OnDestroy {
   }
 
   setTextAnswer(questionId: string, value: string): void {
+    if (this.isProfessorPreview) return;
     const state = this.answers.get(questionId);
     if (state) state.textAnswer = value.trim() || null;
   }
@@ -212,7 +236,7 @@ export class Examen implements OnInit, OnDestroy {
   }
 
   submitExam(): void {
-    if (!this.attempt || this.submitting) return;
+    if (!this.attempt || this.submitting || this.isProfessorPreview) return;
     this.submitting = true;
 
     const answers: SubmitAnswerRequest[] = this.questions.map((q): SubmitAnswerRequest => {

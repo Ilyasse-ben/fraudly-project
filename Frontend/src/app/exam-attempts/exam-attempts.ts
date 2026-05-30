@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { AssessmentService } from '../service/assessment.service';
@@ -20,7 +20,8 @@ export class ExamAttemptsComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private assessmentService: AssessmentService
+    private assessmentService: AssessmentService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -65,10 +66,12 @@ export class ExamAttemptsComponent implements OnInit {
       next: (attempts) => {
         this.attempts = attempts;
         this.loading = false;
+        this.cdr.detectChanges();
       },
       error: () => {
         this.loading = false;
         this.error = 'Failed to load attempts.';
+        this.cdr.detectChanges();
       },
     });
   }

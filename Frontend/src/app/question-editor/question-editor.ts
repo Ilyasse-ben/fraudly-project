@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AssessmentService } from '../service/assessment.service';
@@ -34,6 +34,7 @@ export class QuestionEditorComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private assessmentService: AssessmentService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -99,10 +100,12 @@ export class QuestionEditorComponent implements OnInit {
           reason: '',
         }));
         this.loading = false;
+        this.cdr.detectChanges();
       },
       error: () => {
         this.error = 'Failed to load exam.';
         this.loading = false;
+        this.cdr.detectChanges();
       },
     });
   }

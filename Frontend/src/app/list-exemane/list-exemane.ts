@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { DatePipe, CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 import { AssessmentService } from '../service/assessment.service';
+import { AuthService } from '../core/services/auth.service';
 import { ExamResponse, Difficulty } from '../models/assessment.model';
 
 @Component({
@@ -15,14 +16,21 @@ export class ListExemane implements OnInit {
   exams: ExamResponse[] = [];
   loading = true;
   error = '';
+  isTeacher = false;
+  isStudent = false;
   private actionLoadingIds = new Set<string>();
 
   constructor(
     private assessmentService: AssessmentService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private cdr: ChangeDetectorRef,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
+    this.isTeacher = this.authService.isProfessor();
+    this.isStudent = this.authService.isStudent();
+
     const courseId = this.route.snapshot.queryParamMap.get('courseId');
 
     if (courseId) {
@@ -30,30 +38,51 @@ export class ListExemane implements OnInit {
         next: (exams) => {
           this.exams = exams;
           this.loading = false;
+          this.cdr.detectChanges();
         },
         error: () => {
           this.loading = false;
           this.error = 'Failed to load exams. Please try again.';
+          this.cdr.detectChanges();
         },
       });
       return;
     }
 
-    const professorId = this.extractUserIdFromToken();
-    if (!professorId) {
-      this.loading = false;
-      this.error = 'Could not identify user. Please log in again.';
+    if (this.isTeacher) {
+      const professorId = this.extractUserIdFromToken();
+      if (!professorId) {
+        this.loading = false;
+        this.error = 'Could not identify user. Please log in again.';
+        return;
+      }
+      this.assessmentService.getExamsByProfessor(professorId).subscribe({
+        next: (exams) => {
+          this.exams = exams;
+          this.loading = false;
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.loading = false;
+          this.error = 'Failed to load exams. Please try again.';
+          this.cdr.detectChanges();
+        },
+      });
       return;
     }
 
-    this.assessmentService.getExamsByProfessor(professorId).subscribe({
+    // ROLE_STUDENT: load all published exams by course (default COURSE1_ID)
+    const defaultCourseId = '66666666-6666-6666-6666-666666666666';
+    this.assessmentService.getExamsByCourse(defaultCourseId).subscribe({
       next: (exams) => {
-        this.exams = exams;
+        this.exams = exams.filter(e => e.status === 'PUBLISHED');
         this.loading = false;
+        this.cdr.detectChanges();
       },
       error: () => {
         this.loading = false;
         this.error = 'Failed to load exams. Please try again.';
+        this.cdr.detectChanges();
       },
     });
   }
@@ -92,11 +121,22 @@ export class ListExemane implements OnInit {
     return this.exams.filter((e) => e.status === 'PUBLISHED').length;
   }
 
+  statusBadgeClass(status: string): string {
+    const map: Record<string, string> = {
+      DRAFT:     'bg-yellow-50 text-yellow-700',
+      REVIEWED:  'bg-blue-50 text-blue-700',
+      PUBLISHED: 'bg-green-50 text-green-700',
+      ARCHIVED:  'bg-slate-100 text-slate-500',
+      GRADING:   'bg-purple-50 text-purple-700',
+    };
+    return map[status] ?? 'bg-slate-100 text-slate-600';
+  }
+
   badgeClass(difficulty: Difficulty): string {
     const map: Record<Difficulty, string> = {
-      EASY: 'bg-green-50 text-green-600',
-      MEDIUM: 'bg-blue-50 text-blue-600',
-      HARD: 'bg-purple-50 text-purple-600',
+      EASY:      'bg-green-50 text-green-600',
+      MEDIUM:    'bg-blue-50 text-blue-600',
+      HARD:      'bg-purple-50 text-purple-600',
       VERY_HARD: 'bg-orange-50 text-orange-600',
     };
     return map[difficulty] ?? 'bg-slate-50 text-slate-600';

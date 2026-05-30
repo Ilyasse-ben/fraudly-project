@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { NgClass, DatePipe } from '@angular/common';
 import { ProctoringService } from '../service/proctoring.service';
 import { ProctoringSessionResponse, FraudEventResponse } from '../models/proctoring.model';
@@ -18,17 +18,22 @@ export class ProctoringReview implements OnInit {
   sessionsError = '';
   eventsError = '';
 
-  constructor(private proctoringService: ProctoringService) {}
+  constructor(
+    private proctoringService: ProctoringService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     this.proctoringService.getFlaggedSessions().subscribe({
       next: (sessions) => {
         this.sessions = sessions;
         this.loadingSessions = false;
+        this.cdr.detectChanges();
       },
       error: () => {
         this.loadingSessions = false;
         this.sessionsError = 'Failed to load flagged sessions.';
+        this.cdr.detectChanges();
       },
     });
   }
@@ -42,10 +47,12 @@ export class ProctoringReview implements OnInit {
       next: (events) => {
         this.events = events;
         this.loadingEvents = false;
+        this.cdr.detectChanges();
       },
       error: () => {
         this.loadingEvents = false;
         this.eventsError = 'Failed to load events for this session.';
+        this.cdr.detectChanges();
       },
     });
   }

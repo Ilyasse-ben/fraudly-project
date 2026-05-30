@@ -24,7 +24,6 @@ export class ExamBuilderComponent implements OnInit {
   ) {
     this.builderForm = this.fb.group({
       topic: ['', Validators.required],
-      course_id: ['', Validators.required],
       difficulty: ['MEDIUM', Validators.required],
       total_questions: [10, [Validators.required, Validators.min(1)]],
       qcm_count: [5, Validators.min(0)],
@@ -41,16 +40,20 @@ export class ExamBuilderComponent implements OnInit {
   onSubmit(): void {
     if (this.builderForm.invalid) return;
 
+    const professorId = this.extractUserIdFromToken();
+
     this.loading = true;
     this.error = null;
 
     const request: BackendAiGenerationRequest = {
       ...this.builderForm.value,
-      chapter_ids: [] // Future: Link to actual chapter selection UI
+      course_id: '66666666-6666-6666-6666-666666666666',
+      chapter_ids: [],
+      professor_id: professorId ?? '',
     };
 
     this.assessmentService.generateExam(request).subscribe({
-      next: (exam) => {
+      next: () => {
         this.loading = false;
         this.router.navigate(['/listexemen']);
       },
@@ -59,5 +62,16 @@ export class ExamBuilderComponent implements OnInit {
         this.error = err.message || 'Failed to generate exam';
       }
     });
+  }
+
+  private extractUserIdFromToken(): string | null {
+    const token = localStorage.getItem('fraudly_access_token');
+    if (!token) return null;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1])) as Record<string, unknown>;
+      return (payload['userId'] ?? payload['sub'] ?? null) as string | null;
+    } catch {
+      return null;
+    }
   }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AssessmentService } from '../service/assessment.service';
 import { OpenAnswerItem } from '../models/assessment.model';
@@ -21,6 +21,7 @@ export class ManualGradingComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private assessmentService: AssessmentService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -32,10 +33,12 @@ export class ManualGradingComponent implements OnInit {
         this.answers = answers;
         answers.forEach(a => this.scoreInputs.set(a.answerId, a.pointsAwarded ?? 0));
         this.loading = false;
+        this.cdr.detectChanges();
       },
       error: () => {
         this.error = 'Failed to load open answers.';
         this.loading = false;
+        this.cdr.detectChanges();
       },
     });
   }

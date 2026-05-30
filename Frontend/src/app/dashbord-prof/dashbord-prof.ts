@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { forkJoin } from 'rxjs';
 import { AnalyticsService } from '../core/services/analytics.service';
 import { TopicStats, StudentGrade } from '../core/models/analytics.model';
 
@@ -12,7 +13,8 @@ import { TopicStats, StudentGrade } from '../core/models/analytics.model';
 })
 export class DashbordProf implements OnInit {
 
-  // Data containers for the HTML
+  private readonly COURSE1_ID = '66666666-6666-6666-6666-666666666666';
+
   stats = {
     totalStudents: 0,
     activeCourses: 0,
@@ -27,68 +29,61 @@ export class DashbordProf implements OnInit {
   studentsGrades: StudentGrade[] = [];
   pendingCount = 0;
 
-  constructor(private analyticsService: AnalyticsService) {}
-
-  // Inside dashbord-prof.ts
+  constructor(
+    private analyticsService: AnalyticsService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
-    const courseId = 'f47ac10b-58cc-4372-a567-0e02b2c3d479';
+    const courseId = this.COURSE1_ID;
 
-    // 1. Populate Course Statistics
-    this.analyticsService.getCourseTopicStats(courseId).subscribe({
-      next: (data) => {
-        this.courseStats = data;
+    forkJoin({
+      topics: this.analyticsService.getCourseTopicStats(courseId),
+      grades: this.analyticsService.getStudentsGrades(courseId),
+    }).subscribe({
+      next: ({ topics, grades }) => {
+        this.courseStats = topics;
+        this.studentsGrades = grades;
+        this.updateStats(grades, topics);
         this.loading = false;
+        this.cdr.detectChanges();
       },
       error: () => {
         this.loading = false;
-        this.error = 'Failed to load analytics data.';
-      },
-    });
-
-    // 2. Populate Grades Table
-    this.analyticsService.getStudentsGrades(courseId).subscribe({
-      next: (data) => {
-        this.studentsGrades = data;
-        this.updateStats(data);
-        this.loading = false;
-      },
-      error: () => {
-        this.loading = false;
-        this.error = 'Failed to load grades data.';
+        this.error = 'Failed to load dashboard data.';
+        this.cdr.detectChanges();
       },
     });
   }
 
-  updateStats(grades: StudentGrade[]): void {
+  updateStats(grades: StudentGrade[], topics: TopicStats[]): void {
     const total = grades.length;
-    if (total === 0) return;
+    const avg = total > 0
+      ? grades.reduce((acc, curr) => acc + curr.average, 0) / total
+      : 0;
 
-    const avg = grades.reduce((acc, curr) => acc + curr.average, 0) / total;
     this.stats = {
       totalStudents: total,
-      activeCourses: 12, // Or fetch from a Courses service
+      activeCourses: topics.length,
       classAverage: parseFloat(avg.toFixed(1)),
-      examsCompleted: total * 3 // Mock logic or fetch from backend
+      examsCompleted: grades.length,
     };
-  }
-
-  loadAnalytics(courseId: string): void {
-    // 1. Fetch Topic Statistics
-    this.analyticsService.getCourseTopicStats(courseId).subscribe({
-      next: (data) => {
-        this.courseStats = data;
-      },
-      error: (err) => console.error('Failed to load topic stats', err)
-    });
-
-    // Note: You may need to add methods in your AnalyticsService
-    // to fetch topStudents and studentGrades if you haven't yet.
   }
 
   // Used by the HTML progress bar width
   calculatePercentage(questions: number): number {
-    const MAX_QUESTIONS = 50; // Set this to your desired scale
+    const MAX_QUESTIONS = 50;
     return Math.min((questions / MAX_QUESTIONS) * 100, 100);
+  }
+
+  private extractUserIdFromToken(): string | null {
+    const token = localStorage.getItem('fraudly_access_token');
+    if (!token) return null;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1])) as Record<string, unknown>;
+      return (payload['userId'] ?? payload['sub'] ?? null) as string | null;
+    } catch {
+      return null;
+    }
   }
 }
