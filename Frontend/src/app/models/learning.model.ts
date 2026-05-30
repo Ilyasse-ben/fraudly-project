@@ -28,7 +28,6 @@ export interface CreateCoursRequest {
   title: string;
   description: string;
   category: string;
-  coursCode: string;
   profId: string;
 }
 

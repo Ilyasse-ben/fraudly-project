@@ -43,12 +43,19 @@
 
           <div class="mt-auto">
             <div class="flex items-center justify-between pt-6 border-t border-slate-100">
-              <div class="font-mono text-sm text-slate-400 font-semibold">{{ course.coursCode }}</div>
-              <a [routerLink]="['/cours', course.id]">
-                <button class="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold transition">
-                  View Course
+              <div class="font-mono text-sm text-slate-400 font-semibold uppercase">{{ course.coursCode }}</div>
+
+              @if (course.id) {
+                <a [routerLink]="['/cours', course.id]">
+                  <button class="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold transition">
+                    View Course
+                  </button>
+                </a>
+              } @else {
+                <button disabled class="px-5 py-2.5 rounded-xl bg-slate-300 text-white text-sm font-semibold cursor-not-allowed">
+                  Invalid ID
                 </button>
-              </a>
+              }
             </div>
           </div>
         </div>

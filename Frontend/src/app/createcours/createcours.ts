@@ -28,7 +28,6 @@ export class Createcours implements OnInit {
       title:       ['', Validators.required],
       description: ['', Validators.required],
       category:    ['', Validators.required],
-      coursCode:   ['', Validators.required],
     });
   }
 
@@ -51,14 +50,13 @@ export class Createcours implements OnInit {
       },
       error: (err) => {
         this.loading = false;
-        this.error = err?.error?.message ?? 'Failed to create course. Please verify the API connection.';
+        this.error = err?.error?.message ?? 'Failed to create course.';
         this.cdr.detectChanges();
       },
     });
   }
 
   cancel(): void {
-    // Make sure this route matches your app.routes.ts definition (usually '/all-cours' or '/dashbord')
-    this.router.navigate(['/dashbord']);
+    this.router.navigate(['/Allcours']);
   }
 }

@@ -20,7 +20,6 @@ public class Cours {
     private String category;
     private Date courseDate ;
     private String coursCode;
-    // ID provenant du service d'authentification
     private UUID profId;
 
     @OneToMany(mappedBy = "cours", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -20,10 +20,11 @@ export class Allcours implements OnInit {
   constructor(
     private learningService: LearningService,
     private authService: AuthService,
-    private cdr: ChangeDetectorRef // Inject the Change Detector
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
+    // Initialize role
     this.isTeacher = this.authService.isProfessor();
     this.loadCourses();
   }
@@ -34,18 +35,15 @@ export class Allcours implements OnInit {
 
     this.learningService.getAllCourses().subscribe({
       next: (data) => {
-        this.courses = data || [];
+        // Ensure data is defined, default to empty array
+        this.courses = Array.isArray(data) ? data : [];
         this.loading = false;
-
-        // Force Angular to update the HTML immediately
         this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('API Error:', err);
-        this.error = 'Failed to load courses. Please check if the backend is running.';
+        this.error = 'Failed to load courses. Please check your backend connection.';
         this.loading = false;
-
-        // Force Angular to show the error message
         this.cdr.detectChanges();
       }
     });
