@@ -37,43 +37,28 @@ export class Createcours implements OnInit {
   onSubmit(): void {
     if (this.courseForm.invalid) return;
 
-    const profId = this.extractUserIdFromToken();
-    if (!profId) {
-      this.error = 'Could not identify user. Please log in again.';
-      return;
-    }
-
     this.loading = true;
     this.error = null;
 
+    // Uses POST /api/learning/courses
     this.learningService.createCourse({
-      ...this.courseForm.value,
-      profId,
+      ...this.courseForm.value
     }).subscribe({
-      next: () => {
+      next: (createdCourse) => {
         this.loading = false;
-        this.router.navigate(['/Allcours']);
+        // Navigate directly to the newly created course details
+        this.router.navigate(['/cours', createdCourse.id]);
       },
       error: (err) => {
         this.loading = false;
-        this.error = err?.error?.message ?? err?.message ?? 'Failed to create course. Please try again.';
+        this.error = err?.error?.message ?? 'Failed to create course. Please verify the API connection.';
         this.cdr.detectChanges();
       },
     });
   }
 
   cancel(): void {
-    this.router.navigate(['/Allcours']);
-  }
-
-  private extractUserIdFromToken(): string | null {
-    const token = localStorage.getItem('fraudly_access_token');
-    if (!token) return null;
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1])) as Record<string, unknown>;
-      return (payload['userId'] ?? payload['sub'] ?? null) as string | null;
-    } catch {
-      return null;
-    }
+    // Make sure this route matches your app.routes.ts definition (usually '/all-cours' or '/dashbord')
+    this.router.navigate(['/dashbord']);
   }
 }

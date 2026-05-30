@@ -1,22 +1,32 @@
 <main class="flex-1 px-20 py-10">
 
-  <!-- PAGE HEADER -->
   <div class="mb-10">
     <h1 class="text-5xl font-bold mb-3">Create New Course</h1>
     <p class="text-slate-500 text-lg">Create and manage educational content for your students</p>
   </div>
 
   @if (error) {
-    <div class="px-6 py-4 mb-8 rounded-2xl bg-red-50 border border-red-200 text-red-700 font-medium">
+    <div class="px-6 py-4 mb-8 rounded-2xl bg-red-50 border border-red-200 text-red-700 font-medium shadow-sm">
       {{ error }}
     </div>
   }
 
-  <!-- FORM CARD -->
-  <div class="bg-white border border-slate-200 rounded-3xl p-10 max-w-5xl">
+  <div class="bg-white border border-slate-200 rounded-3xl p-10 max-w-5xl shadow-sm relative overflow-hidden">
+
+    @if (loading) {
+      <div class="absolute inset-0 bg-white/60 backdrop-blur-sm z-10 flex items-center justify-center">
+        <div class="text-blue-600 font-semibold text-lg flex items-center gap-3">
+          <svg class="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Creating Course...
+        </div>
+      </div>
+    }
+
     <form [formGroup]="courseForm" (ngSubmit)="onSubmit()" class="space-y-8">
 
-      <!-- TITLE -->
       <div>
         <label class="block text-sm font-semibold text-slate-700 mb-3">
           Course Title <span class="text-red-400">*</span>
@@ -24,11 +34,11 @@
         <input
           formControlName="title"
           type="text"
-          placeholder="Example: Machine Learning"
+          placeholder="Example: Machine Learning Fundamentals"
+          [class.opacity-50]="loading"
           class="w-full px-5 py-4 rounded-2xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition" />
       </div>
 
-      <!-- DESCRIPTION -->
       <div>
         <label class="block text-sm font-semibold text-slate-700 mb-3">
           Course Description <span class="text-red-400">*</span>
@@ -36,12 +46,12 @@
         <textarea
           formControlName="description"
           rows="5"
-          placeholder="Describe your course..."
+          placeholder="Describe the objectives and content of this course..."
+          [class.opacity-50]="loading"
           class="w-full px-5 py-4 rounded-2xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition resize-none">
         </textarea>
       </div>
 
-      <!-- CATEGORY + CODE -->
       <div class="grid grid-cols-2 gap-6">
         <div>
           <label class="block text-sm font-semibold text-slate-700 mb-3">
@@ -51,6 +61,7 @@
             formControlName="category"
             type="text"
             placeholder="e.g., Computer Science"
+            [class.opacity-50]="loading"
             class="w-full px-5 py-4 rounded-2xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition" />
         </div>
         <div>
@@ -61,27 +72,27 @@
             formControlName="coursCode"
             type="text"
             placeholder="e.g., ML101"
-            class="w-full px-5 py-4 rounded-2xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition" />
+            [class.opacity-50]="loading"
+            class="w-full px-5 py-4 rounded-2xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition font-mono uppercase" />
         </div>
       </div>
 
-      <!-- ACTIONS -->
       <div class="flex justify-end gap-5 pt-5">
         <button
           type="button"
           (click)="cancel()"
-          class="px-8 py-4 rounded-2xl border border-slate-300 hover:bg-slate-100 transition font-semibold">
+          [disabled]="loading"
+          class="px-8 py-4 rounded-2xl border border-slate-300 hover:bg-slate-100 transition font-semibold text-slate-700 disabled:opacity-50 disabled:cursor-not-allowed">
           Cancel
         </button>
         <button
           type="submit"
           [disabled]="courseForm.invalid || loading"
-          class="px-8 py-4 rounded-2xl bg-blue-600 hover:bg-blue-700 transition text-white font-semibold shadow-lg shadow-blue-100 disabled:opacity-50 disabled:cursor-not-allowed">
-          {{ loading ? 'Creating...' : 'Create Course' }}
+          class="px-8 py-4 rounded-2xl bg-blue-600 hover:bg-blue-700 transition text-white font-semibold shadow-lg shadow-blue-100 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+          {{ loading ? 'Processing...' : 'Create Course' }}
         </button>
       </div>
 
     </form>
   </div>
-
 </main>

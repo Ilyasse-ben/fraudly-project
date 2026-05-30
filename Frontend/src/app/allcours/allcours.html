@@ -1,89 +1,62 @@
 <main class="flex-1 p-12">
-
-  <!-- TOP HEADER -->
   <div class="flex items-center justify-between mb-10">
     <div>
-      <h2 class="text-4xl font-bold mb-2">My Courses</h2>
-      <p class="text-slate-500 text-lg">
-        @if (isTeacher) { Manage your educational content and AI-powered materials }
-        @if (!isTeacher) { Your enrolled courses }
-      </p>
+      <h1 class="text-4xl font-bold mb-2">Course Catalog</h1>
+      <p class="text-slate-500 text-lg">Browse all available educational content</p>
     </div>
-
     @if (isTeacher) {
-      <a routerLink="/createCours"
-         class="px-6 py-4 rounded-2xl bg-blue-600 hover:bg-blue-700 transition text-white font-semibold shadow-lg shadow-blue-100">
-        + Create Course
+      <a routerLink="/createCours">
+        <button class="px-6 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-semibold transition shadow-md shadow-blue-100">
+          + Create New Course
+        </button>
       </a>
     }
   </div>
 
-  <!-- LOADING -->
   @if (loading) {
-    <div class="flex justify-center items-center h-48 text-slate-400 text-lg">
+    <div class="flex justify-center items-center h-64 text-slate-400 text-lg font-medium">
+      <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
       Loading courses...
     </div>
   }
 
-  <!-- ERROR -->
-  @if (!loading && error) {
-    <div class="px-6 py-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 font-medium">
+  @if (error) {
+    <div class="px-6 py-4 mb-8 rounded-2xl bg-red-50 border border-red-200 text-red-700 font-medium">
       {{ error }}
     </div>
   }
 
-  <!-- EMPTY -->
-  @if (!loading && !error && courses.length === 0) {
-    <div class="flex justify-center items-center h-48 text-slate-400 text-lg">
-      No courses found.
-    </div>
-  }
-
-  <!-- COURSE GRID -->
-  @if (!loading && !error && courses.length > 0) {
-    <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+  @if (!loading && !error) {
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
       @for (course of courses; track course.id) {
-        <div class="bg-white rounded-3xl border border-slate-200 p-8 hover:shadow-2xl hover:-translate-y-1 transition duration-300">
-
-          <!-- BADGE -->
-          <span class="inline-block px-4 py-2 rounded-full bg-blue-50 text-blue-600 text-sm font-semibold mb-6">
-            {{ course.category || 'Course' }}
-          </span>
-
-          <!-- TITLE -->
-          <h3 class="text-3xl font-bold mb-3">{{ course.title }}</h3>
-
-          <!-- DESCRIPTION -->
-          <p class="text-slate-500 leading-7 mb-8">{{ course.description }}</p>
-
-          <!-- CODE -->
-          <p class="text-xs text-slate-400 font-mono mb-8">{{ course.coursCode }}</p>
-
-          <!-- ACTIONS -->
-          <div class="flex gap-4">
-            @if (isTeacher) {
-              <button
-                (click)="navigateToChapters(course.id)"
-                class="flex-1 py-4 rounded-2xl border border-blue-600 text-blue-600 font-semibold hover:bg-blue-600 hover:text-white transition">
-                Manage Chapters
-              </button>
-              <button
-                class="flex-1 py-4 rounded-2xl bg-slate-900 text-white font-semibold hover:bg-slate-800 transition">
-                Edit
-              </button>
-            }
-            @if (!isTeacher) {
-              <button
-                (click)="navigateToChapters(course.id)"
-                class="flex-1 py-4 rounded-2xl border border-blue-600 text-blue-600 font-semibold hover:bg-blue-600 hover:text-white transition">
-                View Chapters
-              </button>
-            }
+        <div class="bg-white border border-slate-200 rounded-3xl p-8 hover:shadow-xl transition flex flex-col h-full">
+          <div class="mb-4">
+            <span class="inline-block px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-bold uppercase tracking-wider mb-4">
+              {{ course.category || 'Course' }}
+            </span>
+            <h2 class="text-2xl font-bold mb-3 line-clamp-2 text-slate-800">{{ course.title }}</h2>
+            <p class="text-slate-500 text-sm line-clamp-3 mb-6">{{ course.description }}</p>
           </div>
 
+          <div class="mt-auto">
+            <div class="flex items-center justify-between pt-6 border-t border-slate-100">
+              <div class="font-mono text-sm text-slate-400 font-semibold">{{ course.coursCode }}</div>
+              <a [routerLink]="['/cours', course.id]">
+                <button class="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold transition">
+                  View Course
+                </button>
+              </a>
+            </div>
+          </div>
+        </div>
+      } @empty {
+        <div class="col-span-full flex justify-center items-center h-48 bg-slate-50 border border-dashed border-slate-300 rounded-3xl text-slate-400 text-lg">
+          No courses available at the moment.
         </div>
       }
     </div>
   }
-
 </main>

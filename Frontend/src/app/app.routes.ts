@@ -42,7 +42,7 @@ export const routes: Routes = [
   { path: 'student-attempts/:studentId', component: StudentAttemptsComponent, canActivate: [authGuard, roleGuard], data: { expectedRole: 'ROLE_STUDENT' } },
 
   // Learning service routes (auth only)
-  { path: 'cours', component: Cours, canActivate: [authGuard] },
+  { path: 'cours/:courseId', component: Cours, canActivate: [authGuard] },
   { path: 'createCours', component: Createcours, canActivate: [authGuard] },
   { path: 'chapitre/:courseId', component: Chapiter, canActivate: [authGuard] },
   { path: 'listEtudiant', component: ListEtudientCours, canActivate: [authGuard] },

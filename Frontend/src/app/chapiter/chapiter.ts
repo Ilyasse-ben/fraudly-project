@@ -20,7 +20,6 @@ export class Chapiter implements OnInit {
   courseId = '';
   isTeacher = false;
 
-  // Inline add-chapter form
   showAddForm = false;
   newChapterTitle = '';
   newChapterIndex = 1;
@@ -38,14 +37,17 @@ export class Chapiter implements OnInit {
     this.courseId = this.route.snapshot.paramMap.get('courseId') ?? '';
     this.isTeacher = this.authService.isProfessor();
 
-    this.learningService.getChaptersByCourse(this.courseId).subscribe({
-      next: (chapters) => {
-        this.chapters = chapters.sort((a, b) => a.index - b.index);
+    // Workaround: Since there's no endpoint to get chapters by course,
+    // we get the course and extract the chapters.
+    this.learningService.getCourseById(this.courseId).subscribe({
+      next: (course: any) => {
+        this.chapters = (course.chapitres || []).sort((a: any, b: any) => a.index - b.index);
+        this.newChapterIndex = this.chapters.length + 1;
         this.loading = false;
         this.cdr.detectChanges();
       },
       error: () => {
-        this.error = 'Failed to load chapters. Please try again.';
+        this.error = 'Failed to load chapters for this course.';
         this.loading = false;
         this.cdr.detectChanges();
       },
@@ -57,10 +59,11 @@ export class Chapiter implements OnInit {
     this.saving = true;
     this.saveError = '';
 
-    this.learningService.createChapter({
+    // Fixed: calling createChapter with courseId passed separately to match POST /api/learning/chapitres/{courseId}
+    this.learningService.createChapter(this.courseId, {
       title: this.newChapterTitle.trim(),
       index: this.newChapterIndex,
-      courseId: this.courseId,
+      courseId: this.courseId
     }).subscribe({
       next: (chapter) => {
         this.chapters = [...this.chapters, chapter].sort((a, b) => a.index - b.index);
@@ -70,8 +73,8 @@ export class Chapiter implements OnInit {
         this.saving = false;
         this.cdr.detectChanges();
       },
-      error: () => {
-        this.saveError = 'Failed to create chapter. Please try again.';
+      error: (err) => {
+        this.saveError = err?.error?.message || 'Failed to create chapter. Please try again.';
         this.saving = false;
         this.cdr.detectChanges();
       },
