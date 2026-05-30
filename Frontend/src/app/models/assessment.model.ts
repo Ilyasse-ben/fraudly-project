@@ -68,3 +68,32 @@ export interface ExamAttemptResponse {
   score: number | null;
   maxScore: number | null;
 }
+
+export interface OpenAnswerItem {
+  answerId: string;
+  studentId: string;
+  questionText: string;
+  correctAnswer: string;
+  studentAnswer: string | null;
+  pointsAwarded: number | null;
+  maxPoints: number;
+  isGraded: boolean;
+  modifiedByProfessor: boolean;
+  originalAiScore: number | null;
+  modifiedAt: string | null;
+}
+
+// Request interface for the AI generation endpoint
+export interface BackendAiGenerationRequest {
+  topic: string;
+  course_id: string;
+  chapter_ids: string[];
+  difficulty: Difficulty;
+  total_questions: number;
+  qcm_count: number;
+  true_false_count: number;
+  open_count: number;
+  include_explanations: boolean;
+  professor_instructions: string;
+  top_k: number;
+}

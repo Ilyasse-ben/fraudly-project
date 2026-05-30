@@ -66,10 +66,34 @@
               </p>
             </div>
 
-            <a [routerLink]="['/exemen', exam.id]"
-               class="px-5 py-3 rounded-2xl bg-blue-600 text-white font-semibold hover:bg-blue-700 transition">
-              Start Exam
-            </a>
+            <div class="flex items-center gap-3">
+              @if (exam.status === 'DRAFT') {
+                <button
+                  (click)="validateExam(exam.id)"
+                  [disabled]="isActionLoading(exam.id)"
+                  class="px-5 py-3 rounded-2xl bg-yellow-500 hover:bg-yellow-600 text-white font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed">
+                  {{ isActionLoading(exam.id) ? 'Validating...' : 'Validate' }}
+                </button>
+              }
+              @if (exam.status === 'REVIEWED') {
+                <button
+                  (click)="publishExam(exam.id)"
+                  [disabled]="isActionLoading(exam.id)"
+                  class="px-5 py-3 rounded-2xl bg-green-600 hover:bg-green-700 text-white font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed">
+                  {{ isActionLoading(exam.id) ? 'Publishing...' : 'Publish' }}
+                </button>
+              }
+              @if (exam.status === 'PUBLISHED') {
+                <a [routerLink]="['/exam-attempts', exam.id]"
+                   class="px-5 py-3 rounded-2xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-semibold transition">
+                  View Results
+                </a>
+              }
+              <a [routerLink]="['/exemen', exam.id]"
+                 class="px-5 py-3 rounded-2xl bg-blue-600 text-white font-semibold hover:bg-blue-700 transition">
+                Start Exam
+              </a>
+            </div>
           </div>
         </div>
       }

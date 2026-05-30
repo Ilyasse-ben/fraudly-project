@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import {
@@ -7,6 +7,8 @@ import {
   ExamAttemptResponse,
   StartAttemptRequest,
   SubmitAttemptRequest,
+  BackendAiGenerationRequest,
+  OpenAnswerItem,
 } from '../models/assessment.model';
 
 @Injectable({ providedIn: 'root' })
@@ -14,6 +16,11 @@ export class AssessmentService {
   private readonly baseUrl = `${environment.apiUrl}/exams`;
 
   constructor(private http: HttpClient) {}
+
+  // Generates a new exam via AI service
+  generateExam(request: BackendAiGenerationRequest): Observable<ExamResponse> {
+    return this.http.post<ExamResponse>(`${this.baseUrl}/generate`, request);
+  }
 
   getExamsByProfessor(professorId: string): Observable<ExamResponse[]> {
     return this.http.get<ExamResponse[]>(`${this.baseUrl}/professor/${professorId}`);
@@ -29,5 +36,44 @@ export class AssessmentService {
 
   submitAttempt(request: SubmitAttemptRequest): Observable<ExamAttemptResponse> {
     return this.http.post<ExamAttemptResponse>(`${this.baseUrl}/attempts/submit`, request);
+  }
+
+  getExamsByCourse(courseId: string): Observable<ExamResponse[]> {
+    return this.http.get<ExamResponse[]>(`${this.baseUrl}/course/${courseId}`);
+  }
+
+  validateExam(examId: string): Observable<ExamResponse> {
+    return this.http.put<ExamResponse>(`${this.baseUrl}/${examId}/validate`, {});
+  }
+
+  publishExam(examId: string): Observable<ExamResponse> {
+    return this.http.put<ExamResponse>(`${this.baseUrl}/${examId}/publish`, {});
+  }
+
+  getAttemptsByExam(examId: string): Observable<ExamAttemptResponse[]> {
+    return this.http.get<ExamAttemptResponse[]>(`${this.baseUrl}/attempts/exam/${examId}`);
+  }
+
+  triggerCorrection(examId: string): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/${examId}/correction`, {});
+  }
+
+  getOpenAnswers(examId: string): Observable<OpenAnswerItem[]> {
+    return this.http.get<OpenAnswerItem[]>(`${this.baseUrl}/${examId}/open-answers`);
+  }
+
+  updateAnswerScore(answerId: string, pointsAwarded: number, professorId: string): Observable<void> {
+    const params = new HttpParams()
+      .set('pointsAwarded', pointsAwarded.toString())
+      .set('professorId', professorId);
+    return this.http.patch<void>(`${this.baseUrl}/answers/${answerId}/score`, null, { params });
+  }
+
+  getAttempt(attemptId: string): Observable<ExamAttemptResponse> {
+    return this.http.get<ExamAttemptResponse>(`${this.baseUrl}/attempts/${attemptId}`);
+  }
+
+  getAttemptsByStudent(studentId: string): Observable<ExamAttemptResponse[]> {
+    return this.http.get<ExamAttemptResponse[]>(`${this.baseUrl}/attempts/student/${studentId}`);
   }
 }

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable, tap, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { AuthResponse, LoginRequest, RegisterRequest } from '../models/auth.models';
 
@@ -28,7 +28,11 @@ export class AuthService {
 
   refresh(): Observable<AuthResponse> {
     const refreshToken = localStorage.getItem(this.REFRESH_KEY);
-    // Note: Ensure your backend expects { refreshToken: string } in the body
+    if (!refreshToken) {
+      this.logout();
+      return throwError(() => new Error('No refresh token available'));
+    }
+
     return this.http.post<AuthResponse>(`${environment.apiUrl}/auth/refresh`, { refreshToken }).pipe(
       tap(res => {
         localStorage.setItem(this.TOKEN_KEY, res.accessToken);

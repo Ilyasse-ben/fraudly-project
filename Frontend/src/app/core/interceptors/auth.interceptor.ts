@@ -1,5 +1,5 @@
 import { inject } from '@angular/core';
-import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
+import { HttpInterceptorFn, HttpErrorResponse, HttpRequest, HttpHandlerFn, HttpEvent } from '@angular/common/http';
 import { BehaviorSubject, catchError, filter, switchMap, take, throwError, Observable } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 
@@ -10,19 +10,19 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
   const token = authService.getToken();
 
-  // If no token, proceed with the request
-  if (!token) {
+  // 1. Skip interceptor for refresh or login/register endpoints to prevent loops
+  if (!token || req.url.includes('/auth/login') || req.url.includes('/auth/register') || req.url.includes('/auth/refresh')) {
     return next(req);
   }
 
-  // Add the token to the request
+  // 2. Add the token to the request
   const authReq = req.clone({
     setHeaders: { Authorization: `Bearer ${token}` }
   });
 
   return next(authReq).pipe(
     catchError((error) => {
-      // If we get a 401, attempt to refresh
+      // 3. If we get a 401, attempt to refresh
       if (error instanceof HttpErrorResponse && error.status === 401) {
         return handle401Error(authReq, next, authService);
       }
@@ -31,7 +31,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   );
 };
 
-function handle401Error(req: any, next: any, authService: AuthService): Observable<any> {
+function handle401Error(req: HttpRequest<unknown>, next: HttpHandlerFn, authService: AuthService): Observable<HttpEvent<unknown>> {
   if (!isRefreshing) {
     isRefreshing = true;
     refreshTokenSubject.next(null);
@@ -40,7 +40,7 @@ function handle401Error(req: any, next: any, authService: AuthService): Observab
       switchMap((tokenResponse: any) => {
         isRefreshing = false;
         refreshTokenSubject.next(tokenResponse.accessToken);
-        // Retry the original request
+        // Retry the original request with new token
         return next(req.clone({
           setHeaders: { Authorization: `Bearer ${tokenResponse.accessToken}` }
         }));
@@ -52,7 +52,7 @@ function handle401Error(req: any, next: any, authService: AuthService): Observab
       })
     );
   } else {
-    // Queue requests while refreshing
+    // 4. Queue requests while the first one is refreshing
     return refreshTokenSubject.pipe(
       filter(token => token !== null),
       take(1),

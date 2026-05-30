@@ -1,0 +1,52 @@
+<div class="max-w-3xl mx-auto p-8">
+  <h2 class="text-3xl font-bold mb-8">Generate AI Exam</h2>
+
+  @if (error) {
+    <div class="p-4 mb-6 bg-red-50 text-red-700 rounded-2xl border border-red-200">
+      {{ error }}
+    </div>
+  }
+
+  <form [formGroup]="builderForm" (ngSubmit)="onSubmit()" class="space-y-6">
+    <div class="grid grid-cols-2 gap-6">
+      <div class="col-span-2">
+        <label class="block text-sm font-medium mb-2">Topic</label>
+        <input formControlName="topic" class="w-full px-4 py-3 rounded-xl border border-slate-200" placeholder="e.g., Neural Networks">
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium mb-2">Difficulty</label>
+        <select formControlName="difficulty" class="w-full px-4 py-3 rounded-xl border border-slate-200">
+          @for (d of difficulties; track d) {
+            <option [value]="d">{{ d }}</option>
+          }
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium mb-2">Total Questions</label>
+        <input type="number" formControlName="total_questions" class="w-full px-4 py-3 rounded-xl border border-slate-200">
+      </div>
+    </div>
+
+    <div class="grid grid-cols-3 gap-4">
+      <div>
+        <label class="block text-xs uppercase text-slate-400 mb-2">QCM</label>
+        <input type="number" formControlName="qcm_count" class="w-full px-4 py-3 rounded-xl border border-slate-200">
+      </div>
+      <div>
+        <label class="block text-xs uppercase text-slate-400 mb-2">T/F</label>
+        <input type="number" formControlName="true_false_count" class="w-full px-4 py-3 rounded-xl border border-slate-200">
+      </div>
+      <div>
+        <label class="block text-xs uppercase text-slate-400 mb-2">Open</label>
+        <input type="number" formControlName="open_count" class="w-full px-4 py-3 rounded-xl border border-slate-200">
+      </div>
+    </div>
+
+    <button type="submit" [disabled]="builderForm.invalid || loading"
+            class="w-full py-4 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 disabled:opacity-50">
+      {{ loading ? 'Generating Exam...' : 'Generate Exam' }}
+    </button>
+  </form>
+</div>

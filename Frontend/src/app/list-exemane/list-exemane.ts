@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { DatePipe, CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, ActivatedRoute } from '@angular/router';
 import { AssessmentService } from '../service/assessment.service';
 import { ExamResponse, Difficulty } from '../models/assessment.model';
 
@@ -15,10 +15,30 @@ export class ListExemane implements OnInit {
   exams: ExamResponse[] = [];
   loading = true;
   error = '';
+  private actionLoadingIds = new Set<string>();
 
-  constructor(private assessmentService: AssessmentService) {}
+  constructor(
+    private assessmentService: AssessmentService,
+    private route: ActivatedRoute
+  ) {}
 
   ngOnInit(): void {
+    const courseId = this.route.snapshot.queryParamMap.get('courseId');
+
+    if (courseId) {
+      this.assessmentService.getExamsByCourse(courseId).subscribe({
+        next: (exams) => {
+          this.exams = exams;
+          this.loading = false;
+        },
+        error: () => {
+          this.loading = false;
+          this.error = 'Failed to load exams. Please try again.';
+        },
+      });
+      return;
+    }
+
     const professorId = this.extractUserIdFromToken();
     if (!professorId) {
       this.loading = false;
@@ -34,6 +54,36 @@ export class ListExemane implements OnInit {
       error: () => {
         this.loading = false;
         this.error = 'Failed to load exams. Please try again.';
+      },
+    });
+  }
+
+  isActionLoading(examId: string): boolean {
+    return this.actionLoadingIds.has(examId);
+  }
+
+  validateExam(examId: string): void {
+    this.actionLoadingIds.add(examId);
+    this.assessmentService.validateExam(examId).subscribe({
+      next: (updated) => {
+        this.exams = this.exams.map(e => e.id === examId ? { ...e, status: updated.status } : e);
+        this.actionLoadingIds.delete(examId);
+      },
+      error: () => {
+        this.actionLoadingIds.delete(examId);
+      },
+    });
+  }
+
+  publishExam(examId: string): void {
+    this.actionLoadingIds.add(examId);
+    this.assessmentService.publishExam(examId).subscribe({
+      next: (updated) => {
+        this.exams = this.exams.map(e => e.id === examId ? { ...e, status: updated.status } : e);
+        this.actionLoadingIds.delete(examId);
+      },
+      error: () => {
+        this.actionLoadingIds.delete(examId);
       },
     });
   }

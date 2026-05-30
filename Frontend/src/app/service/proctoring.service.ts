@@ -4,6 +4,7 @@ import { Observable, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
 import {
   FraudEventRequest,
+  FraudEventResponse,
   ProctoringSessionResponse,
   StartSessionRequest,
 } from '../models/proctoring.model';
@@ -40,5 +41,13 @@ export class ProctoringService {
 
   reportEvent(request: FraudEventRequest): Observable<unknown> {
     return this.http.post(`${this.baseUrl}/events`, request);
+  }
+
+  getFlaggedSessions(): Observable<ProctoringSessionResponse[]> {
+    return this.http.get<ProctoringSessionResponse[]>(`${this.baseUrl}/sessions/flagged`);
+  }
+
+  getSessionEvents(sessionId: string): Observable<FraudEventResponse[]> {
+    return this.http.get<FraudEventResponse[]>(`${this.baseUrl}/events/session/${sessionId}`);
   }
 }

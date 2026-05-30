@@ -31,3 +31,14 @@ export interface ProctoringSessionResponse {
   startedAt: string;
   endedAt: string | null;
 }
+
+export interface FraudEventResponse {
+  id: string;
+  sessionId: string;
+  studentId: string;
+  examId: string;
+  eventType: FraudEventType;
+  confidenceScore: number;
+  details: string | null;
+  detectedAt: string;
+}
